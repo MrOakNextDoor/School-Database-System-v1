@@ -152,8 +152,8 @@ class Settings(DataLoader):
         return d
 
     def restore_defaults(self) -> None:
-        self.restore_last: bool = constants.DEFAULT_SETTINGS.TITLE_BAR.value
-        self.title: str = constants.DEFAULT_SETTINGS.TITLE_BAR.value
+        self.restore_last: bool = constants.DEFAULT_SETTINGS.RESTORE_LAST.value
+        self.title: str = constants.DEFAULT_SETTINGS.TITLE.value
 
 class Section(DataLoader):
     def __init__(self, grade: int, name: str) -> None:

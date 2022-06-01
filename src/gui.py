@@ -22,6 +22,10 @@ class Page(tk.Frame):
         else:
             self.pack_forget()
 
+class HomePage(Page):
+    def __init__(self, master) -> None:
+        super().__init__(master=master)
+
 class PageManager:
     def __init__(self) -> None:
         

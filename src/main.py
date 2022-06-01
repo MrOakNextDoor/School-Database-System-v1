@@ -10,48 +10,42 @@ import misc
 
 #   Code
 class App(tk.Tk):
-    def __init__(self) -> None:
+	def __init__(self) -> None:
 
-        super().__init__()
+		super().__init__()
 
-        self.pagemanager = gui.PageManager()
+		self.appstate = data.AppState()
+		self.settings = data.Settings()
 
-        self.settings = data.Settings()
-        self.appstate = data.AppState()
-        self.reload_loaders()
-        self.reload_window()
+		self.pagemanager = gui.PageManager()
 
-        if self.settings.restore_last:
-            pass
-        else:
-            self.title(constants.DEFAULT_SETTINGS.TITLE.value)
-            w = round((self.winfo_screenwidth()/5)*3)
-            h = round((self.winfo_screenheight()/5)*3)
-            x = round((self.winfo_screenwidth()/2) - (w/2))
-            y = round((self.winfo_screenheight()/2) - (h/2))
-            self.geometry(f'{w}x{h}+{x}+{y}')
+		if self.settings.restore_last:
+			self.restore_last()
+		else:
+			self.reload_window()
+			w = round((self.winfo_screenwidth()/5)*4)
+			h = round((self.winfo_screenheight()/5)*4)
+			x = round((self.winfo_screenwidth()/2)-(w/2))
+			y = round((self.winfo_screenheight()/2)-(h/2))
+			self.geometry(f'{w}x{h}+{x}+{y}')
 
-        self.protocol('WM_DELETE_WINDOW', self.exit)
-        self.mainloop()
+		self.protocol('WM_DELETE_WINDOW', self.exit)
+		self.mainloop()
 
-    def reload_loaders(self, event=None) -> None:
-        self.settings.load()
-        self.appstate.load()
+	def restore_last(self) -> None:
+		self.appstate.load()
 
-    def reload_window(self, event=None) -> None:
-        self.title(self.settings.title)
+	def reload_window(self) -> None:
+		self.settings.load()
 
-    def dump(self, event=None) -> None:
+		self.title(self.settings.title)
 
-        self.settings.dump()
-        self.appstate.dump()
+	def exit(self) -> None:
 
-    def exit(self) -> None:
-        
-        self.dump()
+		self.appstate.dump()
 
-        self.destroy()
+		self.destroy()
 
 if __name__ == '__main__':
-    a = App()
-    sys.exit(0)
+	a = App()
+	sys.exit(0)
