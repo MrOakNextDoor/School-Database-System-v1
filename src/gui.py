@@ -12,6 +12,7 @@ import misc
 class Page(ABC, tk.Frame):
 	def __init__(self, master) -> None:
 		super().__init__(master=master)
+		self.parent = master
 		self._visible = False
 
 	@property
@@ -46,18 +47,18 @@ class HomePage(Page):
 			bd=0, bg='#e6e6e6')
 		self.search_bar_lbl.pack(side='left')
 		self.search_bar.pack(expand=True, fill='x', side='right')
-		self.top_search_frm.pack(fill='x', padx=20, pady=(20, 5))
+		self.top_search_frm.pack(fill='x', padx=20, pady=(20, 6))
 
 		self.bottom_search_frm = tk.Frame(master=self.inner_l_frm)
 		self.list_scrollbar = tk.Scrollbar(master=self.bottom_search_frm)
 		self.list = tk.Listbox(master=self.bottom_search_frm, yscrollcommand=self.list_scrollbar.set, 
 			relief='solid', bd=0, bg='#e6e6e6')
 		self.list_scrollbar.config(command=self.list.yview)
-		for i in range(100):
+		for i in range(1, 101):
 			self.list.insert(tk.END, f'Keon Clone {i}')
 		self.list_scrollbar.pack(fill='y', side='right')
 		self.list.pack(expand=True, fill='both', side='left')
-		self.bottom_search_frm.pack(expand=True, fill='both', padx=20, pady=(5, 20))
+		self.bottom_search_frm.pack(expand=True, fill='both', padx=20, pady=(6, 20))
 
 		self.inner_l_frm.pack(expand=True, fill='x', padx=(30, 10))
 		self.l_frm.pack(expand=True, fill='both', side='left')
@@ -65,43 +66,55 @@ class HomePage(Page):
 		self.r_frm = tk.Frame(master=self)
 		self.inner_r_frm = tk.Frame(master=self.r_frm)
 		self.new_btn = tk.Button(master=self.inner_r_frm, text='New', height=3, 
-			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebf0')
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.new)
 		self.open_btn = tk.Button(master=self.inner_r_frm, text='Open', height=3, 
-			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebf0')
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
 		self.open_recent_btn = tk.Button(master=self.inner_r_frm, text='Open Recent', 
-			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebf0')
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
 		self.more_btn = tk.Button(master=self.inner_r_frm, text='More Actions', 
-			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebf0')
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
 		self.exit_btn = tk.Button(master=self.inner_r_frm, text='Exit', height=3, 
-			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebf0')
-		self.new_btn.pack(expand=True, fill='x', padx=5, pady=(20, 2))
-		self.open_btn.pack(expand=True, fill='x', padx=5, pady=2)
-		self.open_recent_btn.pack(expand=True, fill='x', padx=5, pady=2)
-		self.more_btn.pack(expand=True, fill='x', padx=5, pady=(2, 10))
-		self.exit_btn.pack(expand=True, fill='x', padx=5, pady=10)
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.parent.exit)
+		self.new_btn.pack(expand=True, fill='x', padx=6, pady=(20, 2))
+		self.open_btn.pack(expand=True, fill='x', padx=6, pady=2)
+		self.open_recent_btn.pack(expand=True, fill='x', padx=6, pady=2)
+		self.more_btn.pack(expand=True, fill='x', padx=6, pady=(2, 10))
+		self.exit_btn.pack(expand=True, fill='x', padx=6, pady=10)
 		self.inner_r_frm.pack(expand=True, fill='x', padx=(10, 30))
 		self.r_frm.pack(expand=True, fill='both', side='right')
 		
 		self.search_bar_tooltip = Tooltip(self.search_bar, text='Search Bar', 
 			font=('Bahnschrift Light', 10))
+		self.new_btn_tooltip = Tooltip(self.new_btn, text='Create a New Student, Teacher, or Section.', 
+			font=('Bahnschrift Light', 10))
+		self.open_btn_tooltip = Tooltip(self.open_btn, text='Access file of a Student, a Teacher, or a Sections.', 
+			font=('Bahnschrift Light', 10))
+		self.open_recent_btn_tooltip = Tooltip(self.open_recent_btn, text='Open a recently-accessed file.', 
+			font=('Bahnschrift Light', 10))
+		self.more_btn_tooltip = Tooltip(self.more_btn, text='More Actions...', 
+			font=('Bahnschrift Light', 10))
+		self.exit_btn_tooltip = Tooltip(self.exit_btn, text='Exit SDS', 
+			font=('Bahnschrift Light', 10))
 
 		self.dynresize = DynamicResize(self)
-		self.dynresize.add_child(self.title, 'Bahnschrift', 35, 40, 10)
-		self.dynresize.add_child(self.search_bar_lbl, 'Bahnschrift Light', 16, 20, 5)
-		self.dynresize.add_child(self.search_bar, 'Bahnschrift Light', 16, 20, 5)
-		self.dynresize.add_child(self.list, 'Bahnschrift Light', 16, 20, 5)
-		self.dynresize.add_child(self.new_btn, 'Bahnschrift Light', 14, 18, 5)
-		self.dynresize.add_child(self.open_btn, 'Bahnschrift Light', 14, 18, 5)
-		self.dynresize.add_child(self.open_recent_btn, 'Bahnschrift Light', 14, 18, 5)
-		self.dynresize.add_child(self.more_btn, 'Bahnschrift Light', 14, 18, 5)
-		self.dynresize.add_child(self.exit_btn, 'Bahnschrift Light', 14, 18, 5)
+		self.dynresize.add_child(self.title, 'Bahnschrift', 36, 40, 10)
+		self.dynresize.add_child(self.search_bar_lbl, 'Bahnschrift Light', 16, 20, 6)
+		self.dynresize.add_child(self.search_bar, 'Bahnschrift Light', 16, 20, 6)
+		self.dynresize.add_child(self.list, 'Bahnschrift Light', 16, 20, 6)
+		self.dynresize.add_child(self.new_btn, 'Bahnschrift Light', 14, 18, 6)
+		self.dynresize.add_child(self.open_btn, 'Bahnschrift Light', 14, 18, 6)
+		self.dynresize.add_child(self.open_recent_btn, 'Bahnschrift Light', 14, 18, 6)
+		self.dynresize.add_child(self.more_btn, 'Bahnschrift Light', 14, 18, 6)
+		self.dynresize.add_child(self.exit_btn, 'Bahnschrift Light', 14, 18, 6)
 
 		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
 		
 		#	TODO: Work on themes for customizable look
-		self.title.config(font=('Bahnschrift', 35))
+		self.title.config(font=('Bahnschrift', 36))
 		self.search_bar_lbl.config(font=('Bahnschrift Light', 16))
 		self.search_bar.config(font=('Bahnschrift Light', 16))
 		self.list.config(font=('Bahnschrift Light', 16))
@@ -112,6 +125,72 @@ class HomePage(Page):
 		self.exit_btn.config(font=('Bahnschrift Light', 14))
 
 		self.search_bar_tooltip.font = ('Bahnschrift Light', 10)
+		self.new_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.open_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.open_recent_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.more_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.exit_btn_tooltip.font = ('Bahnschrift Light', 10)
+
+	def new(self, event=None) -> None:
+		self.parent.pagemanager.current_page = 'newpage'
+
+class NewPage(Page):
+	def __init__(self, master: tk.Widget) -> None:
+		super().__init__(master=master)
+
+		self.inner_frm = tk.Frame(master=self)
+		self.title = tk.Label(master=self.inner_frm, text='Create New')
+		self.student_btn = tk.Button(master=self.inner_frm, text='New Student', 
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.teacher_btn = tk.Button(master=self.inner_frm, text='New Teacher', 
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.section_btn = tk.Button(master=self.inner_frm, text='New Section', 
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.back_btn = tk.Button(master=self.inner_frm, text='Back', 
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.back)
+		self.title.pack(expand=True, fill='x', side='top', pady=10)
+		self.student_btn.pack(expand=True, fill='x', padx=10, pady=(10, 2))
+		self.teacher_btn.pack(expand=True, fill='x', padx=10, pady=2)
+		self.section_btn.pack(expand=True, fill='x', padx=10, pady=(2, 10))
+		self.back_btn.pack(expand=True, fill='x', padx=10, pady=(10, 0))
+		self.inner_frm.pack(expand=True, fill='x', padx=30)
+
+		self.student_btn_tooltip = Tooltip(self.student_btn, 
+			text='Create a New Student Profile', font=('Bahnschrift Light', 10))
+		self.teacher_btn_tooltip = Tooltip(self.teacher_btn, 
+			text='Create a New Teacher Profile', font=('Bahnschrift Light', 10))
+		self.section_btn_tooltip = Tooltip(self.section_btn, 
+			text='Create a New Section', font=('Bahnschrift Light', 10))
+		self.back_btn_tooltip = Tooltip(self.back_btn, 
+			text='Go Back to Previous Page', font=('Bahnschrift Light', 10))
+
+		self.dynresize = DynamicResize(self)
+		self.dynresize.add_child(self.title, 'Bahnschrift', 36, 40, 10)
+		self.dynresize.add_child(self.student_btn, 'Bahnschrift Light', 16, 20, 6)
+		self.dynresize.add_child(self.teacher_btn, 'Bahnschrift Light', 16, 20, 6)
+		self.dynresize.add_child(self.section_btn, 'Bahnschrift Light', 16, 20, 6)
+		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 16, 20, 6)
+
+		self.reload_page()
+
+	def reload_page(self) -> None:
+		
+		self.title.config(font=('Bahnschrift', 36))
+		self.student_btn.config(font=('Bahnschrift Light', 16))
+		self.teacher_btn.config(font=('Bahnschrift Light', 16))
+		self.section_btn.config(font=('Bahnschrift Light', 16))
+		self.back_btn.config(font=('Bahnschrift Light', 16))
+
+		self.student_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.student_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.teacher_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.section_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.back_btn_tooltip.font = ('Bahnschrift Light', 10)
+
+	def back(self) -> None:
+
+		self.parent.pagemanager.back()
 
 class PageManager:
 	def __init__(self) -> None:
@@ -177,14 +256,14 @@ class PageManager:
 			raise KeyError(f'Page \"{name}\" not found.')
 
 #   From Erik Bethke from:
-#   https://stackoverflow.com/questions/3221956/how-do-i-display-tooltips-in-tkinter
+#   https://stackoverflow.com/questions/3221966/how-do-i-display-tooltips-in-tkinter
 #   Though I have added some modifications
 #   TODO: 
 #   - Add fade in and out
 class Tooltip:
-	def __init__(self, widget, *, bd=1, bg='#FFFFEA', pad=(5, 3, 5, 3), 
+	def __init__(self, widget, *, bd=1, bg='#FFFFEA', pad=(6, 3, 6, 3), 
 		text='This is a tooltip', font=('Bahnschrift Light', 10), waittime=300, 
-		wraplength=250):
+		wraplength=260):
 
 		self.widget = widget
 		self.text = text
@@ -243,7 +322,7 @@ class Tooltip:
 			tw.destroy()
 		self._tw = None
 
-	def tip_pos_calc(self, widget, label, tip_delta=(10, 5), pad=(5, 3, 5, 3)
+	def tip_pos_calc(self, widget, label, tip_delta=(10, 6), pad=(6, 3, 6, 3)
 		) -> Tuple[int, int]:
 
 		w = widget
@@ -296,16 +375,16 @@ class DynamicResize:
 		self.parent.bind('<Configure>', self)
 
 	def add_child(self, child: tk.Widget, font: str='Bahnschrift Light', 
-		fontsize: int=15, maxfontsize: int=20, minfontsize: int=5) -> None:
+		fontsize: int=16, maxfontsize: int=20, minfontsize: int=6) -> None:
 		"""Add a child.
 
 		Args:
 			child (tk.Widget): The child to be added.
 			font (str): The font to be used. Defaults to 'Bahnschrift Light.'
 			fontsize (int): The fontsize to scale the child from. Defaults to 
-			15.
+			16.
 			maxfontsize (int): The maximum fontsize. Defaults to 20.
-			minfontsize (int): The minimum fontsize. Defaults to 5.
+			minfontsize (int): The minimum fontsize. Defaults to 6.
 			overwrite (bool): Determines whether to overwrite an existing child
 			or not. Defaults to True
 		"""
@@ -326,7 +405,10 @@ class DynamicResize:
 		
 		for child, values in self.children.items():
 			try:
-				ratio = (self.parent.winfo_width()/self.parent.winfo_screenwidth())
+				if self.parent.winfo_height() > self.parent.winfo_width():
+					ratio = (self.parent.winfo_width()/self.parent.winfo_screenwidth())
+				else:
+					ratio = (self.parent.winfo_height()/self.parent.winfo_screenheight())
 				fontsize = round(ratio * values['fontsize'])
 				if fontsize > values['maxfontsize']:
 					fontsize = values['maxfontsize']

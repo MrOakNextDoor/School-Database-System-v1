@@ -19,8 +19,10 @@ class App(tk.Tk):
 
 		self.pagemanager = gui.PageManager()
 		self.homepage = gui.HomePage(self)
+		self.newpage = gui.NewPage(self)
 
 		self.pagemanager.add_page('homepage', self.homepage)
+		self.pagemanager.add_page('newpage', self.newpage)
 
 		if self.settings.restore_last:
 			self.restore_last()
