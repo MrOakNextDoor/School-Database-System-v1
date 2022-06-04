@@ -4,13 +4,14 @@
 import tkinter as tk
 from abc import ABC, abstractmethod
 #from tkinter import ttk
-from typing import Any, List, Dict, Tuple
+from typing import Any, Dict, Tuple
 
+import data
 import misc
 
 #   Code
 class Page(ABC, tk.Frame):
-	def __init__(self, master) -> None:
+	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 		self.parent = master
 		self._visible = False
@@ -32,7 +33,7 @@ class Page(ABC, tk.Frame):
 		pass
 
 class HomePage(Page):
-	def __init__(self, master) -> None:
+	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
 		self.l_frm = tk.Frame(master=self)
@@ -141,7 +142,8 @@ class NewPage(Page):
 		self.inner_frm = tk.Frame(master=self)
 		self.title = tk.Label(master=self.inner_frm, text='Create New')
 		self.student_btn = tk.Button(master=self.inner_frm, text='New Student', 
-			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.student)
 		self.teacher_btn = tk.Button(master=self.inner_frm, text='New Teacher', 
 			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
 		self.section_btn = tk.Button(master=self.inner_frm, text='New Section', 
@@ -191,6 +193,42 @@ class NewPage(Page):
 	def back(self) -> None:
 
 		self.parent.pagemanager.back()
+
+	def student(self) -> None:
+		
+		self.parent.studentpage = StudentPage(self.parent)
+		self.parent.pagemanager.pages['studentpage'] = self.parent.studentpage
+		self.parent.pagemanager.current_page = 'studentpage'
+
+class StudentPage(Page):
+	def __init__(self, master: tk.Widget) -> None:
+		super().__init__(master)
+		
+		self.namefrm = tk.Frame(master=self)
+		self.lname_lbl = tk.Label(master=self.namefrm, text='Last Name')
+		self.fname_lbl = tk.Label(master=self.namefrm, text='First Name')
+		self.mname_lbl = tk.Label(master=self.namefrm, text='Middle Name')
+		self.lname_entry = tk.Entry(master=self.namefrm, relief='solid', 
+			bd=0, bg='#e6e6e6')
+		self.fname_entry = tk.Entry(master=self.namefrm, relief='solid', 
+			bd=0, bg='#e6e6e6')
+		self.mname_entry = tk.Entry(master=self.namefrm, relief='solid', 
+			bd=0, bg='#e6e6e6')
+
+		self.lname_lbl.grid(column=0, columnspan=1, row=0, rowspan=1)
+		self.lname_entry.grid(column=1, columnspan=2, row=0, rowspan=1)
+		self.fname_lbl.grid(column=3, columnspan=1, row=0, rowspan=1)
+		self.fname_entry.grid(column=4, columnspan=2, row=0, rowspan=1)
+		self.mname_lbl.grid(column=6, columnspan=1, row=0, rowspan=1)
+		self.mname_entry.grid(column=7, columnspan=2, row=0, rowspan=1)
+		self.namefrm.pack(expand=True, fill='x')
+	
+	@staticmethod
+	def load(student: data.Student) -> 'StudentPage':
+		pass
+
+	def reload_page(self, event=None) -> None:
+		pass
 
 class PageManager:
 	def __init__(self) -> None:
