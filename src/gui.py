@@ -1,6 +1,7 @@
 #   Handles how the app looks
 
 #   Libraries
+from locale import currency
 import tkinter as tk
 from abc import ABC, abstractmethod
 #from tkinter import ttk
@@ -88,11 +89,11 @@ class HomePage(Page):
 		
 		self.search_bar_tooltip = Tooltip(self.search_bar, text='Search Bar', 
 			font=('Bahnschrift Light', 10))
-		self.new_btn_tooltip = Tooltip(self.new_btn, text='Create a New Student, Teacher, or Section.', 
+		self.new_btn_tooltip = Tooltip(self.new_btn, text='Create a New Profile', 
 			font=('Bahnschrift Light', 10))
-		self.open_btn_tooltip = Tooltip(self.open_btn, text='Access file of a Student, a Teacher, or a Sections.', 
+		self.open_btn_tooltip = Tooltip(self.open_btn, text='Access a Profile', 
 			font=('Bahnschrift Light', 10))
-		self.open_recent_btn_tooltip = Tooltip(self.open_recent_btn, text='Open a recently-accessed file.', 
+		self.open_recent_btn_tooltip = Tooltip(self.open_recent_btn, text='Open a recently-accessed profile.', 
 			font=('Bahnschrift Light', 10))
 		self.more_btn_tooltip = Tooltip(self.more_btn, text='More Actions...', 
 			font=('Bahnschrift Light', 10))
@@ -145,9 +146,11 @@ class NewPage(Page):
 			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
 			command=self.student)
 		self.teacher_btn = tk.Button(master=self.inner_frm, text='New Teacher', 
-			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.teacher)
 		self.section_btn = tk.Button(master=self.inner_frm, text='New Section', 
-			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.section)
 		self.back_btn = tk.Button(master=self.inner_frm, text='Back', 
 			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
 			command=self.back)
@@ -196,36 +199,27 @@ class NewPage(Page):
 
 	def student(self) -> None:
 		
-		self.parent.studentpage = StudentPage(self.parent)
-		self.parent.pagemanager.pages['studentpage'] = self.parent.studentpage
-		self.parent.pagemanager.current_page = 'studentpage'
+		pass
 
-class StudentPage(Page):
+	def teacher(self) -> None:
+
+		pass
+
+	def section(self) -> None:
+		
+		pass
+
+class PersonPage(Page):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master)
-		
-		self.namefrm = tk.Frame(master=self)
-		self.lname_lbl = tk.Label(master=self.namefrm, text='Last Name')
-		self.fname_lbl = tk.Label(master=self.namefrm, text='First Name')
-		self.mname_lbl = tk.Label(master=self.namefrm, text='Middle Name')
-		self.lname_entry = tk.Entry(master=self.namefrm, relief='solid', 
-			bd=0, bg='#e6e6e6')
-		self.fname_entry = tk.Entry(master=self.namefrm, relief='solid', 
-			bd=0, bg='#e6e6e6')
-		self.mname_entry = tk.Entry(master=self.namefrm, relief='solid', 
-			bd=0, bg='#e6e6e6')
 
-		self.lname_lbl.grid(column=0, columnspan=1, row=0, rowspan=1)
-		self.lname_entry.grid(column=1, columnspan=2, row=0, rowspan=1)
-		self.fname_lbl.grid(column=3, columnspan=1, row=0, rowspan=1)
-		self.fname_entry.grid(column=4, columnspan=2, row=0, rowspan=1)
-		self.mname_lbl.grid(column=6, columnspan=1, row=0, rowspan=1)
-		self.mname_entry.grid(column=7, columnspan=2, row=0, rowspan=1)
-		self.namefrm.pack(expand=True, fill='x')
-	
-	@staticmethod
-	def load(student: data.Student) -> 'StudentPage':
-		pass
+		self.general_frm = tk.LabelFrame(self.master, text='General Information')
+		self.school_frm = tk.LabelFrame(self.master, text='School Information')
+
+		self.sectionmng = PageManager()
+		self.general_section = Page(master=self.general_frm)
+
+		self.sectionmng.add_page('general', self.general_subpage)
 
 	def reload_page(self, event=None) -> None:
 		pass
