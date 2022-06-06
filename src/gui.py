@@ -221,6 +221,7 @@ class PersonPage(Page):
 
 		self.sectionmng.add_page('general', self.general_subpage)
 
+
 	def reload_page(self, event=None) -> None:
 		pass
 
