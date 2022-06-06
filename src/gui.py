@@ -209,22 +209,6 @@ class NewPage(Page):
 		
 		pass
 
-class PersonPage(Page):
-	def __init__(self, master: tk.Widget) -> None:
-		super().__init__(master)
-
-		self.general_frm = tk.LabelFrame(self.master, text='General Information')
-		self.school_frm = tk.LabelFrame(self.master, text='School Information')
-
-		self.sectionmng = PageManager()
-		self.general_section = Page(master=self.general_frm)
-
-		self.sectionmng.add_page('general', self.general_subpage)
-
-
-	def reload_page(self, event=None) -> None:
-		pass
-
 class PageManager:
 	def __init__(self) -> None:
 		
