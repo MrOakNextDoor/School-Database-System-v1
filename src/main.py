@@ -17,12 +17,12 @@ class App(tk.Tk):
 		self.appstate = data.AppState()
 		self.settings = data.Settings()
 
-		self.pagemanager = gui.PageManager()
+		self.pagemng = gui.PageManager()
 		self.homepage = gui.HomePage(self)
 		self.newpage = gui.NewPage(self)
 
-		self.pagemanager.add_page('homepage', self.homepage)
-		self.pagemanager.add_page('newpage', self.newpage)
+		self.pagemng.add_page('homepage', self.homepage)
+		self.pagemng.add_page('newpage', self.newpage)
 
 		if self.settings.restore_last:
 			self.restore_last()
@@ -34,7 +34,7 @@ class App(tk.Tk):
 			self.geometry(f'{w}x{h}+{x}+{y}')
 			if self.settings.expand:
 				self.state('zoomed')
-			self.pagemanager.current_page = 'homepage'
+			self.pagemng.current_page = 'homepage'
 			self.reload_window()
 
 		self.protocol('WM_DELETE_WINDOW', self.exit)
@@ -45,19 +45,19 @@ class App(tk.Tk):
 
 		self.title(self.settings.title)
 
-		self.pagemanager.pages[self.pagemanager.current_page].reload_page()
+		self.pagemng.pages[self.pagemng.current_page].reload_page()
 
 	def restore_last(self) -> None:
 
 		self.appstate.load()
 
-		self.pagemanager.current_page = self.appstate.current_page
-		self.pagemanager.previous_page = self.appstate.previous_page
+		self.pagemng.current_page = self.appstate.current_page
+		self.pagemng.previous_page = self.appstate.previous_page
 
 	def dump(self) -> None:
 		
-		self.appstate.current_page = self.pagemanager.current_page
-		self.appstate.previous_page = self.pagemanager.previous_page
+		self.appstate.current_page = self.pagemng.current_page
+		self.appstate.previous_page = self.pagemng.previous_page
 
 		self.appstate.dump()
 		self.settings.dump()

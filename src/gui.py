@@ -1,10 +1,11 @@
 #   Handles how the app looks
 
 #   Libraries
-from locale import currency
 import tkinter as tk
 from abc import ABC, abstractmethod
-#from tkinter import ttk
+from calendar import monthrange
+from datetime import date
+from tkinter import ttk
 from typing import Any, Dict, Tuple
 
 import data
@@ -32,7 +33,7 @@ class Page(ABC, tk.Frame):
 	@abstractmethod
 	def reload_page(self, event=None) -> None:
 		pass
-
+	
 class HomePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
@@ -134,7 +135,7 @@ class HomePage(Page):
 		self.exit_btn_tooltip.font = ('Bahnschrift Light', 10)
 
 	def new(self, event=None) -> None:
-		self.parent.pagemanager.current_page = 'newpage'
+		self.parent.pagemng.current_page = 'newpage'
 
 class NewPage(Page):
 	def __init__(self, master: tk.Widget) -> None:
@@ -195,11 +196,12 @@ class NewPage(Page):
 
 	def back(self) -> None:
 
-		self.parent.pagemanager.back()
+		self.parent.pagemng.back()
 
 	def student(self) -> None:
 		
-		pass
+		self.master.pagemng.pages['tempprofilepage'] = ProfilePage(self.master)
+		self.master.pagemng.current_page = 'tempprofilepage'
 
 	def teacher(self) -> None:
 
@@ -208,6 +210,132 @@ class NewPage(Page):
 	def section(self) -> None:
 		
 		pass
+
+class GeneralSection(Page):
+	MONTHS = ('January', 'February', 'March', 'April', 'May', 'June', 'July', 
+		'August', 'September', 'October', 'November', 'December')
+	GENDERS = ('Male', 'Female')
+	def __init__(self, master: tk.Widget) -> None:
+		super().__init__(master=master)
+
+		#	Name
+		self.name_frm = tk.Frame(master=self)
+		self.lname_lbl = tk.Label(master=self.name_frm, text='Last Name')
+		self.lname_entry = tk.Entry(master=self.name_frm)
+		self.fname_lbl = tk.Label(master=self.name_frm, text='First Name')
+		self.fname_entry = tk.Entry(master=self.name_frm)
+		self.mname_lbl = tk.Label(master=self.name_frm, text='Middle Name')
+		self.mname_entry = tk.Entry(master=self.name_frm)
+
+		self.lname_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.lname_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.fname_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.fname_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.mname_lbl.grid(column=6, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.mname_entry.grid(column=7, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		
+		self.name_frm.columnconfigure(1, weight=1)
+		self.name_frm.columnconfigure(4, weight=1)
+		self.name_frm.columnconfigure(7, weight=1)
+
+		self.name_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Address
+		self.address_frm = tk.Frame(master=self)
+		self.address_lbl = tk.Label(master=self.address_frm, text='Address')
+		self.address_entry = tk.Entry(master=self.address_frm)
+
+		self.address_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.address_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+
+		self.address_frm.columnconfigure(1, weight=1)
+
+		self.address_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Birthday
+		self.bday_frm = tk.Frame(master=self)
+		self.month_lbl = tk.Label(master=self.bday_frm, text='Month')
+		self.month_cbox = ttk.Combobox(master=self.bday_frm)
+		self.day_lbl = tk.Label(master=self.bday_frm, text='Day')
+		self.day_entry = tk.Entry(master=self.bday_frm)
+		self.year_lbl = tk.Label(master=self.bday_frm, text='Year')
+		self.year_entry = tk.Entry(master=self.bday_frm)
+
+		self.month_cbox['values'] = self.MONTHS
+
+		self.month_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.month_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.day_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.day_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.year_lbl.grid(column=6, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.year_entry.grid(column=7, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		
+		self.bday_frm.columnconfigure(1, weight=1)
+		self.bday_frm.columnconfigure(4, weight=1)
+		self.bday_frm.columnconfigure(7, weight=1)
+
+		self.bday_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Contacts
+		self.contacts_frm = tk.Frame(master=self)
+		self.email_lbl = tk.Label(master=self.contacts_frm, text='Email Address')
+		self.email_entry = tk.Entry(master=self.contacts_frm)
+		self.contact_lbl = tk.Label(master=self.contacts_frm, text='Contact Number')
+		self.contact_entry = tk.Entry(master=self.contacts_frm)
+
+		self.email_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.email_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.contact_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.contact_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		
+		self.contacts_frm.columnconfigure(1, weight=1)
+		self.contacts_frm.columnconfigure(4, weight=1)
+
+		self.contacts_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Gender
+		self.gender_frm = tk.Frame(master=self)
+		self.gender_lbl = tk.Label(master=self.gender_frm, text='Gender / Sex')
+		self.gender_cbox = ttk.Combobox(master=self.gender_frm)
+
+		self.gender_cbox['values'] = self.GENDERS
+
+		self.gender_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.gender_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		
+		self.gender_frm.columnconfigure(1, weight=1)
+
+		self.gender_frm.pack(fill='x', padx=10, pady=2)
+
+		self.reload_page()
+
+	def reload_page(self, event=None) -> None:
+		pass
+
+class ProfilePage(Page):
+	def __init__(self, master: tk.Widget) -> None:
+		super().__init__(master)
+
+		self.sectionmng = PageManager()
+
+		self.general_frm = tk.LabelFrame(master=self, text='General Information')
+		self.general_toggle_btn = tk.Button(master=self.general_frm, text='Open Section', 
+			height=1, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=lambda: self.set_section('general'))
+		self.general_section = GeneralSection(master=self.general_frm)
+		self.general_toggle_btn.pack(fill='x', padx=5, pady=5)
+		self.general_frm.pack(fill='both', padx=10, pady=10)
+		
+		self.sectionmng.add_page('general', self.general_section)
+		self.set_section('general')
+
+		self.reload_page()
+
+	def reload_page(self, event=None) -> None:
+		pass
+
+	def set_section(self, name: str) -> None:
+		self.sectionmng.current_page = name
 
 class PageManager:
 	def __init__(self) -> None:
