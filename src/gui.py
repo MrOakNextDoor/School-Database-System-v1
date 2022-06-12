@@ -46,8 +46,7 @@ class HomePage(Page):
 
 		self.top_search_frm = tk.Frame(master=self.inner_l_frm)
 		self.search_bar_lbl = tk.Label(master=self.top_search_frm, text='Search:')
-		self.search_bar = tk.Entry(master=self.top_search_frm, relief='solid', 
-			bd=0, bg='#e6e6e6')
+		self.search_bar = tk.Entry(master=self.top_search_frm, relief='groove', bd=2)
 		self.search_bar_lbl.pack(side='left')
 		self.search_bar.pack(expand=True, fill='x', side='right')
 		self.top_search_frm.pack(fill='x', padx=20, pady=(20, 6))
@@ -55,7 +54,7 @@ class HomePage(Page):
 		self.bottom_search_frm = tk.Frame(master=self.inner_l_frm)
 		self.list_scrollbar = tk.Scrollbar(master=self.bottom_search_frm)
 		self.list = tk.Listbox(master=self.bottom_search_frm, yscrollcommand=self.list_scrollbar.set, 
-			relief='solid', bd=0, bg='#e6e6e6')
+			relief='groove', bd=2)
 		self.list_scrollbar.config(command=self.list.yview)
 		for i in range(1, 101):
 			self.list.insert(tk.END, f'Keon Clone {i}')
@@ -221,32 +220,32 @@ class GeneralSection(Page):
 		#	Name
 		self.name_frm = tk.Frame(master=self)
 		self.lname_lbl = tk.Label(master=self.name_frm, text='Last Name')
-		self.lname_entry = tk.Entry(master=self.name_frm)
+		self.lname_entry = tk.Entry(master=self.name_frm, relief='groove', bd=2)
 		self.fname_lbl = tk.Label(master=self.name_frm, text='First Name')
-		self.fname_entry = tk.Entry(master=self.name_frm)
+		self.fname_entry = tk.Entry(master=self.name_frm, relief='groove', bd=2)
 		self.mname_lbl = tk.Label(master=self.name_frm, text='Middle Name')
-		self.mname_entry = tk.Entry(master=self.name_frm)
+		self.mname_entry = tk.Entry(master=self.name_frm, relief='groove', bd=2)
 
-		self.lname_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.lname_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.fname_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.fname_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.mname_lbl.grid(column=6, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.mname_entry.grid(column=7, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.lname_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.lname_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.fname_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.fname_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.mname_lbl.grid(column=6, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.mname_entry.grid(column=7, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 		
 		self.name_frm.columnconfigure(1, weight=1)
 		self.name_frm.columnconfigure(4, weight=1)
 		self.name_frm.columnconfigure(7, weight=1)
-
+		
 		self.name_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Address
 		self.address_frm = tk.Frame(master=self)
 		self.address_lbl = tk.Label(master=self.address_frm, text='Address')
-		self.address_entry = tk.Entry(master=self.address_frm)
+		self.address_entry = tk.Entry(master=self.address_frm, relief='groove', bd=2)
 
-		self.address_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.address_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.address_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.address_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 
 		self.address_frm.columnconfigure(1, weight=1)
 
@@ -254,21 +253,19 @@ class GeneralSection(Page):
 
 		#	Birthday
 		self.bday_frm = tk.Frame(master=self)
-		self.month_lbl = tk.Label(master=self.bday_frm, text='Month')
-		self.month_cbox = ttk.Combobox(master=self.bday_frm)
-		self.day_lbl = tk.Label(master=self.bday_frm, text='Day')
-		self.day_entry = tk.Entry(master=self.bday_frm)
-		self.year_lbl = tk.Label(master=self.bday_frm, text='Year')
-		self.year_entry = tk.Entry(master=self.bday_frm)
+		self.month_lbl = tk.Label(master=self.bday_frm, text='Month of Birth')
+		self.month_cbox = ttk.Combobox(master=self.bday_frm, state="readonly", values=self.MONTHS)
+		self.day_lbl = tk.Label(master=self.bday_frm, text='Day of Birth')
+		self.day_entry = tk.Entry(master=self.bday_frm, relief='groove', bd=2)
+		self.year_lbl = tk.Label(master=self.bday_frm, text='Year of Birth')
+		self.year_entry = tk.Entry(master=self.bday_frm, relief='groove', bd=2)
 
-		self.month_cbox['values'] = self.MONTHS
-
-		self.month_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.month_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.day_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.day_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.year_lbl.grid(column=6, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.year_entry.grid(column=7, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.month_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.month_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.day_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.day_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.year_lbl.grid(column=6, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.year_entry.grid(column=7, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 		
 		self.bday_frm.columnconfigure(1, weight=1)
 		self.bday_frm.columnconfigure(4, weight=1)
@@ -279,14 +276,14 @@ class GeneralSection(Page):
 		#	Contacts
 		self.contacts_frm = tk.Frame(master=self)
 		self.email_lbl = tk.Label(master=self.contacts_frm, text='Email Address')
-		self.email_entry = tk.Entry(master=self.contacts_frm)
+		self.email_entry = tk.Entry(master=self.contacts_frm, relief='groove', bd=2)
 		self.contact_lbl = tk.Label(master=self.contacts_frm, text='Contact Number')
-		self.contact_entry = tk.Entry(master=self.contacts_frm)
+		self.contact_entry = tk.Entry(master=self.contacts_frm, relief='groove', bd=2)
 
-		self.email_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.email_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.contact_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.contact_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.email_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.email_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.contact_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.contact_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 		
 		self.contacts_frm.columnconfigure(1, weight=1)
 		self.contacts_frm.columnconfigure(4, weight=1)
@@ -296,21 +293,89 @@ class GeneralSection(Page):
 		#	Gender
 		self.gender_frm = tk.Frame(master=self)
 		self.gender_lbl = tk.Label(master=self.gender_frm, text='Gender / Sex')
-		self.gender_cbox = ttk.Combobox(master=self.gender_frm)
+		self.gender_cbox = ttk.Combobox(master=self.gender_frm, state="readonly", values=self.MONTHS)
 
 		self.gender_cbox['values'] = self.GENDERS
 
-		self.gender_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=5, pady=2)
-		self.gender_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=5, pady=2)
+		self.gender_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.gender_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 		
 		self.gender_frm.columnconfigure(1, weight=1)
 
 		self.gender_frm.pack(fill='x', padx=10, pady=2)
 
+		self.dynresize = DynamicResize(self.master.master)
+		self.dynresize.add_child(self.lname_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.lname_entry, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.fname_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.fname_entry, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.mname_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.mname_entry, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.address_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.address_entry, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.month_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.month_cbox, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.day_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.day_entry, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.year_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.year_entry, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.contact_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.contact_entry, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.email_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.email_entry, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.gender_lbl, 'Bahnschrift Light', 12, 14, 4)
+		self.dynresize.add_child(self.gender_cbox, 'Bahnschrift Light', 12, 14, 4)
+
+		self.lname_entry_tooltip = Tooltip(self.lname_entry, text='Last Name')
+		self.fname_entry_tooltip = Tooltip(self.fname_entry, text='First Name')
+		self.mname_entry_tooltip = Tooltip(self.mname_entry, text='Full Middle Name')
+		self.address_entry_tooltip = Tooltip(self.address_entry, text='Address')
+		self.month_cbox_tooltip = Tooltip(self.month_cbox, text='Month of Birth')
+		self.day_entry_tooltip = Tooltip(self.day_entry, text='Day of Birth')
+		self.year_entry_tooltip = Tooltip(self.year_entry, text='Year of Birth')
+		self.contact_entry_tooltip = Tooltip(self.contact_entry, text='Contact Number')
+		self.email_entry_tooltip = Tooltip(self.email_entry, text='Email Address, Optional')
+		self.gender_entry_tooltip = Tooltip(self.gender_cbox, text='Gender')
+
 		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
-		pass
+		
+		self.lname_lbl.config(font=('Bahnschrift Light', 12))
+		self.lname_entry.config(font=('Bahnschrift Light', 12))
+		self.fname_lbl.config(font=('Bahnschrift Light', 12))
+		self.fname_entry.config(font=('Bahnschrift Light', 12))
+		self.mname_lbl.config(font=('Bahnschrift Light', 12))
+		self.mname_entry.config(font=('Bahnschrift Light', 12))
+
+		self.address_lbl.config(font=('Bahnschrift Light', 12))
+		self.address_entry.config(font=('Bahnschrift Light', 12))
+
+		self.month_lbl.config(font=('Bahnschrift Light', 12))
+		self.month_cbox.config(font=('Bahnschrift Light', 12))
+		self.day_lbl.config(font=('Bahnschrift Light', 12))
+		self.day_entry.config(font=('Bahnschrift Light', 12))
+		self.year_lbl.config(font=('Bahnschrift Light', 12))
+		self.year_entry.config(font=('Bahnschrift Light', 12))
+
+		self.contact_lbl.config(font=('Bahnschrift Light', 12))
+		self.contact_entry.config(font=('Bahnschrift Light', 12))
+		self.email_lbl.config(font=('Bahnschrift Light', 12))
+		self.email_entry.config(font=('Bahnschrift Light', 12))
+
+		self.gender_lbl.config(font=('Bahnschrift Light', 12))
+		self.gender_cbox.config(font=('Bahnschrift Light', 12))
+
+		self.lname_entry_tooltip.font = ('Bahnschrift Light', 12)
+		self.fname_entry_tooltip.font = ('Bahnschrift Light', 12)
+		self.mname_entry_tooltip.font = ('Bahnschrift Light', 12)
+		self.address_entry_tooltipfont = ('Bahnschrift Light', 12)
+		self.month_cbox_tooltip.font = ('Bahnschrift Light', 12)
+		self.day_entry_tooltip.font = ('Bahnschrift Light', 12)
+		self.year_entry_tooltip.font = ('Bahnschrift Light', 12)
+		self.contact_entry_tooltip.font = ('Bahnschrift Light', 12)
+		self.email_entry_tooltip.font = ('Bahnschrift Light', 12)
+		self.gender_entry_tooltip.font = ('Bahnschrift Light', 12)
 
 class ProfilePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
