@@ -366,16 +366,16 @@ class GeneralSection(Page):
 		self.gender_lbl.config(font=('Bahnschrift Light', 14))
 		self.gender_cbox.config(font=('Bahnschrift Light', 14))
 
-		self.lname_entry_tooltip.font = ('Bahnschrift Light', 14)
-		self.fname_entry_tooltip.font = ('Bahnschrift Light', 14)
-		self.mname_entry_tooltip.font = ('Bahnschrift Light', 14)
-		self.address_entry_tooltipfont = ('Bahnschrift Light', 14)
-		self.month_cbox_tooltip.font = ('Bahnschrift Light', 14)
-		self.day_entry_tooltip.font = ('Bahnschrift Light', 14)
-		self.year_entry_tooltip.font = ('Bahnschrift Light', 14)
-		self.contact_entry_tooltip.font = ('Bahnschrift Light', 14)
-		self.email_entry_tooltip.font = ('Bahnschrift Light', 14)
-		self.gender_entry_tooltip.font = ('Bahnschrift Light', 14)
+		self.lname_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.fname_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.mname_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.address_entry_tooltipfont = ('Bahnschrift Light', 10)
+		self.month_cbox_tooltip.font = ('Bahnschrift Light', 10)
+		self.day_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.year_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.contact_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.email_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.gender_entry_tooltip.font = ('Bahnschrift Light', 10)
 
 class ProfilePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
@@ -384,23 +384,37 @@ class ProfilePage(Page):
 		self.sectionmng = PageManager()
 
 		self.general_frm = tk.LabelFrame(master=self, text='General')
-		self.general_toggle_btn = tk.Button(master=self.general_frm, text='Open Section', 
+		self.general_open_btn = tk.Button(master=self.general_frm, text='Open Section', 
 			height=1, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
 			command=lambda: self.set_section('general'))
 		self.general_section = GeneralSection(master=self.general_frm)
-		self.general_toggle_btn.pack(fill='x', padx=5, pady=5)
-		self.general_frm.pack(fill='both', padx=10, pady=10)
+		self.general_open_btn.pack(fill='x', padx=5, pady=5)
+		self.general_frm.pack(fill='both', padx=10, pady=10, ipadx=10, ipady=10)
 		
 		self.sectionmng.add_page('general', self.general_section)
 		self.set_section('general')
 
+		self.dynresize = DynamicResize(self.master)
+		self.dynresize.add_child(self.general_frm, font='Bahnschrift Light', 
+			fontsize=14, maxfontsize=16, minfontsize=6)
+		self.dynresize.add_child(self.general_open_btn, font='Bahnschrift Light', 
+			fontsize=12, maxfontsize=14, minfontsize=6)
+
+		self.general_open_btn_tooltip = Tooltip(self.general_open_btn, text='Open this section')
+
 		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
-		pass
+		
+		self.general_frm.config(font=('Bahnschrift Light', 14))
+		self.general_open_btn.config(font=('Bahnschrift Light', 12))
+
+		self.general_open_btn_tooltip.font = ('Bahnschrift Light', 10)
 
 	def set_section(self, name: str) -> None:
 		self.sectionmng.current_page = name
+
+
 
 class PageManager:
 	def __init__(self) -> None:
