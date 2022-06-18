@@ -3,7 +3,6 @@
 #   Libraries
 import tkinter as tk
 from abc import ABC, abstractmethod
-from calendar import monthrange
 from datetime import date
 from tkinter import ttk
 from typing import Any, Dict, Tuple
@@ -199,8 +198,8 @@ class NewPage(Page):
 
 	def student(self) -> None:
 		
-		self.master.pagemng.pages['tempprofilepage'] = ProfilePage(self.master)
-		self.master.pagemng.current_page = 'tempprofilepage'
+		self.master.pagemng.pages['studentpage'] = ProfilePage(self.master)
+		self.master.pagemng.current_page = 'studentpage'
 
 	def teacher(self) -> None:
 
@@ -209,16 +208,22 @@ class NewPage(Page):
 	def section(self) -> None:
 		
 		pass
-
-class GeneralSection(Page):
+		
+class ProfilePage(Page):
 	MONTHS = ('January', 'February', 'March', 'April', 'May', 'June', 'July', 
 		'August', 'September', 'October', 'November', 'December')
 	GENDERS = ('Male', 'Female')
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
+		self.tabmng = ttk.Notebook(master=self)
+		self.tabmng.pack(fill='both', expand=True)
+
+		#	General Frame
+		self.general_frame = tk.Frame(self)
+
 		#	Name
-		self.name_frm = tk.Frame(master=self)
+		self.name_frm = tk.Frame(master=self.general_frame)
 		self.lname_lbl = tk.Label(master=self.name_frm, text='Last Name')
 		self.lname_entry = tk.Entry(master=self.name_frm, relief='groove', bd=2)
 		self.fname_lbl = tk.Label(master=self.name_frm, text='First Name')
@@ -240,7 +245,7 @@ class GeneralSection(Page):
 		self.name_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Address
-		self.address_frm = tk.Frame(master=self)
+		self.address_frm = tk.Frame(master=self.general_frame)
 		self.address_lbl = tk.Label(master=self.address_frm, text='Address')
 		self.address_entry = tk.Entry(master=self.address_frm, relief='groove', bd=2)
 
@@ -252,7 +257,7 @@ class GeneralSection(Page):
 		self.address_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Birthday
-		self.bday_frm = tk.Frame(master=self)
+		self.bday_frm = tk.Frame(master=self.general_frame)
 		self.month_lbl = tk.Label(master=self.bday_frm, text='Month of Birth')
 		self.month_cbox = ttk.Combobox(master=self.bday_frm, state="readonly", values=self.MONTHS)
 		self.day_lbl = tk.Label(master=self.bday_frm, text='Day of Birth')
@@ -274,7 +279,7 @@ class GeneralSection(Page):
 		self.bday_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Contacts
-		self.contacts_frm = tk.Frame(master=self)
+		self.contacts_frm = tk.Frame(master=self.general_frame)
 		self.email_lbl = tk.Label(master=self.contacts_frm, text='Email Address')
 		self.email_entry = tk.Entry(master=self.contacts_frm, relief='groove', bd=2)
 		self.contact_lbl = tk.Label(master=self.contacts_frm, text='Contact Number')
@@ -291,11 +296,9 @@ class GeneralSection(Page):
 		self.contacts_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Gender
-		self.gender_frm = tk.Frame(master=self)
+		self.gender_frm = tk.Frame(master=self.general_frame)
 		self.gender_lbl = tk.Label(master=self.gender_frm, text='Gender / Sex')
-		self.gender_cbox = ttk.Combobox(master=self.gender_frm, state="readonly", values=self.MONTHS)
-
-		self.gender_cbox['values'] = self.GENDERS
+		self.gender_cbox = ttk.Combobox(master=self.gender_frm, state="readonly", values=self.GENDERS)
 
 		self.gender_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.gender_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
@@ -304,7 +307,11 @@ class GeneralSection(Page):
 
 		self.gender_frm.pack(fill='x', padx=10, pady=2)
 
-		self.dynresize = DynamicResize(self.master.master)
+		self.general_frame.pack(expand=True, fill='both')
+
+		self.tabmng.add(self.general_frame, text='General')
+		
+		self.dynresize = DynamicResize(self.master)
 		self.dynresize.add_child(self.lname_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.lname_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.fname_lbl, 'Bahnschrift Light', 14, 16, 6)
@@ -376,44 +383,6 @@ class GeneralSection(Page):
 		self.contact_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.email_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.gender_entry_tooltip.font = ('Bahnschrift Light', 10)
-
-class ProfilePage(Page):
-	def __init__(self, master: tk.Widget) -> None:
-		super().__init__(master)
-
-		self.sectionmng = PageManager()
-
-		self.general_frm = tk.LabelFrame(master=self, text='General')
-		self.general_open_btn = tk.Button(master=self.general_frm, text='Open Section', 
-			height=1, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
-			command=lambda: self.set_section('general'))
-		self.general_section = GeneralSection(master=self.general_frm)
-		self.general_open_btn.pack(fill='x', padx=5, pady=5)
-		self.general_frm.pack(fill='both', padx=10, pady=10, ipadx=10, ipady=10)
-		
-		self.sectionmng.add_page('general', self.general_section)
-		self.set_section('general')
-
-		self.dynresize = DynamicResize(self.master)
-		self.dynresize.add_child(self.general_frm, font='Bahnschrift Light', 
-			fontsize=14, maxfontsize=16, minfontsize=6)
-		self.dynresize.add_child(self.general_open_btn, font='Bahnschrift Light', 
-			fontsize=12, maxfontsize=14, minfontsize=6)
-
-		self.general_open_btn_tooltip = Tooltip(self.general_open_btn, text='Open this section')
-
-		self.reload_page()
-
-	def reload_page(self, event=None) -> None:
-		
-		self.general_frm.config(font=('Bahnschrift Light', 14))
-		self.general_open_btn.config(font=('Bahnschrift Light', 12))
-
-		self.general_open_btn_tooltip.font = ('Bahnschrift Light', 10)
-
-	def set_section(self, name: str) -> None:
-		self.sectionmng.current_page = name
-
 
 
 class PageManager:
