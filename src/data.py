@@ -286,16 +286,16 @@ class Person(DataLoader):
 
 class Student(Person):
 	def __init__(self, path: str, fname: str, lname: str, address: str, 
-		bday: date, grade: int, sex: Literal['M', 'F'], lrn: str, 
+		bday: date, grade: str, sex: Literal['M', 'F'], lrn: str, 
 		sy: Tuple[int, int], contact_no: str=None, email: str=None, 
-		mname: str=None, section: str=None, guardians: List[Person]=None
+		mname: str=None, section: str=None, guardians: List[str]=None
 		) -> None:
 		super().__init__(path, fname, lname, address, bday, contact_no, sex, 
 			email, mname)
 		
 		self.lrn: str = lrn
-		self.grade: int = grade
-		self.guardians: List[Person] = guardians
+		self.grade: str = grade
+		self.guardians: List[str] = guardians
 		self.section: str = section
 		self.sy: Tuple[int, int] = sy
 

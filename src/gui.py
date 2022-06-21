@@ -2,6 +2,7 @@
 
 #   Libraries
 import tkinter as tk
+from tkcalendar import DateEntry
 from abc import ABC, abstractmethod
 from datetime import date
 from tkinter import ttk
@@ -9,6 +10,8 @@ from typing import Any, Dict, Tuple
 
 import data
 import misc
+
+#	TODO: Add the one-window birthday entry
 
 #   Code
 class Page(ABC, tk.Frame):
@@ -198,8 +201,8 @@ class NewPage(Page):
 
 	def student(self) -> None:
 		
-		self.master.pagemng.pages['studentpage'] = ProfilePage(self.master)
-		self.master.pagemng.current_page = 'studentpage'
+		self.master.pagemng.pages['studentpfppage'] = StudentProfilePage(self.master)
+		self.master.pagemng.current_page = 'studentpfppage'
 
 	def teacher(self) -> None:
 
@@ -258,23 +261,13 @@ class ProfilePage(Page):
 
 		#	Birthday
 		self.bday_frm = tk.Frame(master=self.general_frame)
-		self.month_lbl = tk.Label(master=self.bday_frm, text='Month of Birth')
-		self.month_cbox = ttk.Combobox(master=self.bday_frm, state="readonly", values=self.MONTHS)
-		self.day_lbl = tk.Label(master=self.bday_frm, text='Day of Birth')
-		self.day_entry = tk.Entry(master=self.bday_frm, relief='groove', bd=2)
-		self.year_lbl = tk.Label(master=self.bday_frm, text='Year of Birth')
-		self.year_entry = tk.Entry(master=self.bday_frm, relief='groove', bd=2)
+		self.bday_lbl = tk.Label(master=self.bday_frm, text='Birthday')
+		self.bday_entry = DateEntry(master=self.bday_frm, relief='groove', bd=2, state='readonly')
 
-		self.month_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.month_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.day_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.day_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.year_lbl.grid(column=6, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.year_entry.grid(column=7, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
-		
+		self.bday_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.bday_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
 		self.bday_frm.columnconfigure(1, weight=1)
-		self.bday_frm.columnconfigure(4, weight=1)
-		self.bday_frm.columnconfigure(7, weight=1)
 
 		self.bday_frm.pack(fill='x', padx=10, pady=2)
 
@@ -309,7 +302,7 @@ class ProfilePage(Page):
 
 		self.general_frame.pack(expand=True, fill='both')
 
-		self.tabmng.add(self.general_frame, text='General')
+		self.tabmng.add(self.general_frame, text='General Information')
 		
 		self.dynresize = DynamicResize(self.master)
 		self.dynresize.add_child(self.lname_lbl, 'Bahnschrift Light', 14, 16, 6)
@@ -320,12 +313,8 @@ class ProfilePage(Page):
 		self.dynresize.add_child(self.mname_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.address_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.address_entry, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.month_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.month_cbox, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.day_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.day_entry, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.year_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.year_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.bday_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.bday_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.contact_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.contact_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.email_lbl, 'Bahnschrift Light', 14, 16, 6)
@@ -337,14 +326,12 @@ class ProfilePage(Page):
 		self.fname_entry_tooltip = Tooltip(self.fname_entry, text='First Name')
 		self.mname_entry_tooltip = Tooltip(self.mname_entry, text='Full Middle Name')
 		self.address_entry_tooltip = Tooltip(self.address_entry, text='Address')
-		self.month_cbox_tooltip = Tooltip(self.month_cbox, text='Month of Birth')
-		self.day_entry_tooltip = Tooltip(self.day_entry, text='Day of Birth')
-		self.year_entry_tooltip = Tooltip(self.year_entry, text='Year of Birth')
+		self.bday_entry_tooltip = Tooltip(self.bday_entry, text='Birthday in MM/DD/YYYY format')
 		self.contact_entry_tooltip = Tooltip(self.contact_entry, text='Contact Number')
 		self.email_entry_tooltip = Tooltip(self.email_entry, text='Email Address, Optional')
 		self.gender_entry_tooltip = Tooltip(self.gender_cbox, text='Gender')
 
-		self.reload_page()
+		#	Note: Call self.reload_page() on subclasses
 
 	def reload_page(self, event=None) -> None:
 		
@@ -358,13 +345,6 @@ class ProfilePage(Page):
 		self.address_lbl.config(font=('Bahnschrift Light', 14))
 		self.address_entry.config(font=('Bahnschrift Light', 14))
 
-		self.month_lbl.config(font=('Bahnschrift Light', 14))
-		self.month_cbox.config(font=('Bahnschrift Light', 14))
-		self.day_lbl.config(font=('Bahnschrift Light', 14))
-		self.day_entry.config(font=('Bahnschrift Light', 14))
-		self.year_lbl.config(font=('Bahnschrift Light', 14))
-		self.year_entry.config(font=('Bahnschrift Light', 14))
-
 		self.contact_lbl.config(font=('Bahnschrift Light', 14))
 		self.contact_entry.config(font=('Bahnschrift Light', 14))
 		self.email_lbl.config(font=('Bahnschrift Light', 14))
@@ -377,13 +357,80 @@ class ProfilePage(Page):
 		self.fname_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.mname_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.address_entry_tooltipfont = ('Bahnschrift Light', 10)
-		self.month_cbox_tooltip.font = ('Bahnschrift Light', 10)
-		self.day_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.year_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.contact_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.email_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.gender_entry_tooltip.font = ('Bahnschrift Light', 10)
 
+class StudentProfilePage(ProfilePage):
+	GRADE_LVLS = ('Preparatory', 'Kinder I', 'Kinder II', 'Grade I', 'Grade II', 
+		'Grade III', 'Grade IV', 'Grade V', 'Grade VI')
+	def __init__(self, master: tk.Widget) -> None:
+		super().__init__(master=master)
+
+		#	Parents in General Frame
+		self.parents_frm = tk.Frame(master=self.general_frame)
+		self.parents_lbl = tk.Label(master=self.parents_frm, text='Parents (Separate w/ Comma)')
+		self.parents_entry = tk.Entry(master=self.parents_frm, relief='groove', bd=2)
+
+		self.parents_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.parents_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.parents_frm.columnconfigure(1, weight=1)
+		self.parents_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Student Frame
+		self.student_frm = tk.Frame(master=self)
+
+		#	Learners Reference Number
+		self.lrn_frm = tk.Frame(master=self.student_frm)
+		self.lrn_lbl = tk.Label(master=self.lrn_frm, text='Learner\'s Reference Number (LRN)')
+		self.lrn_entry = tk.Entry(master=self.lrn_frm, relief='groove', bd=2)
+
+		self.lrn_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.lrn_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.lrn_frm.columnconfigure(1, weight=1)
+
+		self.lrn_frm.pack(fill='x', padx=10, pady=2)
+		
+		#	Grade Level
+		self.grade_frm = tk.Frame(master=self.student_frm)
+		self.grade_lbl = tk.Label(master=self.grade_frm, text='Grade Level')
+		self.grade_cbox = ttk.Combobox(master=self.grade_frm, state="readonly", values=self.GRADE_LVLS)
+
+		self.grade_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.grade_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.grade_frm.columnconfigure(1, weight=1)
+
+		self.grade_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Section
+		self.section_frm = tk.Frame(master=self.student_frm)
+		self.section_lbl = tk.Label(master=self.section_frm, text='Section')
+		self.section_entry = tk.Entry(master=self.section_frm, relief='groove', bd=2)
+
+		self.section_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.section_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.section_frm.columnconfigure(1, weight=1)
+
+		self.section_frm.pack(fill='x', padx=10, pady=2)
+		
+		self.student_frm.pack(expand=True, fill='both')
+
+		#	Grades Frame
+		self.grades_frm = tk.Frame(master=self)
+
+		self.grades_frm.pack(expand=True, fill='both')
+
+		self.tabmng.add(self.student_frm, text='Student Information')
+		self.tabmng.add(self.grades_frm, text='Grades and Attendance')
+
+		self.reload_page()
+	
+	def reload_page(self, event=None) -> None:
+		pass
 
 class PageManager:
 	def __init__(self) -> None:
