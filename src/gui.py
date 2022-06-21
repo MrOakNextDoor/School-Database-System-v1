@@ -324,10 +324,10 @@ class ProfilePage(Page):
 
 		self.lname_entry_tooltip = Tooltip(self.lname_entry, text='Last Name')
 		self.fname_entry_tooltip = Tooltip(self.fname_entry, text='First Name')
-		self.mname_entry_tooltip = Tooltip(self.mname_entry, text='Full Middle Name')
+		self.mname_entry_tooltip = Tooltip(self.mname_entry, text='Full Middle Name, Optional')
 		self.address_entry_tooltip = Tooltip(self.address_entry, text='Address')
 		self.bday_entry_tooltip = Tooltip(self.bday_entry, text='Birthday in MM/DD/YYYY format')
-		self.contact_entry_tooltip = Tooltip(self.contact_entry, text='Contact Number')
+		self.contact_entry_tooltip = Tooltip(self.contact_entry, text='Contact Number, Optional')
 		self.email_entry_tooltip = Tooltip(self.email_entry, text='Email Address, Optional')
 		self.gender_entry_tooltip = Tooltip(self.gender_cbox, text='Gender')
 
@@ -345,6 +345,9 @@ class ProfilePage(Page):
 		self.address_lbl.config(font=('Bahnschrift Light', 14))
 		self.address_entry.config(font=('Bahnschrift Light', 14))
 
+		self.bday_lbl.config(font=('Bahnschrift Light', 14))
+		self.bday_entry.config(font=('Bahnschrift Light', 14))
+
 		self.contact_lbl.config(font=('Bahnschrift Light', 14))
 		self.contact_entry.config(font=('Bahnschrift Light', 14))
 		self.email_lbl.config(font=('Bahnschrift Light', 14))
@@ -356,7 +359,8 @@ class ProfilePage(Page):
 		self.lname_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.fname_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.mname_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.address_entry_tooltipfont = ('Bahnschrift Light', 10)
+		self.address_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.bday_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.contact_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.email_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.gender_entry_tooltip.font = ('Bahnschrift Light', 10)
@@ -427,10 +431,40 @@ class StudentProfilePage(ProfilePage):
 		self.tabmng.add(self.student_frm, text='Student Information')
 		self.tabmng.add(self.grades_frm, text='Grades and Attendance')
 
+		self.dynresize.add_child(self.parents_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.parents_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.lrn_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.lrn_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.grade_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.grade_cbox, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.section_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.section_entry, 'Bahnschrift Light', 14, 16, 6)
+
+		self.parent_entry_tooltip = Tooltip(self.parents_entry, text='Parents, Separate w/ Comma, Optional')
+		self.lrn_entry_tooltip = Tooltip(self.lrn_entry, text='Learner\'s Reference Number')
+		self.grade_cbox_tooltip = Tooltip(self.grade_cbox, text='Grade Level')
+		self.section_entry_tooltip = Tooltip(self.section_entry, text='Section / Class Name, Optional')
+
 		self.reload_page()
 	
 	def reload_page(self, event=None) -> None:
-		pass
+
+		self.parents_lbl.config(font=('Bahnschrift Light', 14))
+		self.parents_entry.config(font=('Bahnschrift Light', 14))
+
+		self.lrn_lbl.config(font=('Bahnschrift Light', 14))
+		self.lrn_entry.config(font=('Bahnschrift Light', 14))
+
+		self.grade_lbl.config(font=('Bahnschrift Light', 14))
+		self.grade_cbox.config(font=('Bahnschrift Light', 14))
+
+		self.section_lbl.config(font=('Bahnschrift Light', 14))
+		self.section_entry.config(font=('Bahnschrift Light', 14))
+		
+		self.parent_entry_tooltip.font = ('Bahnschrift Light', 10) 
+		self.lrn_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.grade_cbox_tooltip.font = ('Bahnschrift Light', 10)
+		self.section_entry_tooltip.font = ('Bahnschrift Light', 10)
 
 class PageManager:
 	def __init__(self) -> None:
