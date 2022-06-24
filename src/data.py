@@ -326,11 +326,11 @@ class Student(Person):
 class Teacher(Person):
 	def __init__(self, fname: str, lname: str, address: str, 
 		bday: date, contact_no: str, sex: Literal['M', 'F'], email: str=None, 
-		advisory_class: str=None, mname: str=None) -> None:
+		advisory_class: Section=None, mname: str=None) -> None:
 		super().__init__(fname, lname, address, bday, contact_no, sex, email, 
 			mname)
 
-		self.advisory_class: str = advisory_class
+		self.advisory_class: Section = advisory_class
 
 	def load(self) -> 'Teacher':
 
