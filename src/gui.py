@@ -2,6 +2,7 @@
 
 #   Libraries
 import tkinter as tk
+from PIL import ImageTk, Image
 from abc import ABC, abstractmethod
 from datetime import date
 from tkcalendar import DateEntry
@@ -202,12 +203,12 @@ class NewPage(Page):
 
 	def student(self) -> None:
 		
-		self.master.pagemng.pages['pfppage'] = StudentPfp(self.master)
+		self.master.pagemng.pages['pfppage'] = StudentProfilePage(self.master)
 		self.master.pagemng.current_page = 'pfppage'
 
 	def teacher(self) -> None:
 
-		self.master.pagemng.pages['pfppage'] = TeacherPfp(self.master)
+		self.master.pagemng.pages['pfppage'] = TeacherProfilePage(self.master)
 		self.master.pagemng.current_page = 'pfppage'
 
 	def section(self) -> None:
@@ -227,10 +228,18 @@ class ProfilePage(Page):
 		self.tabmng.pack(fill='both', expand=True)
 
 		#	General Frame
-		self.general_frame = tk.Frame(self)
+		self.general_frm = tk.Frame(self)
+
+		#	Profile Pic
+		self.pfp_frm = tk.Frame(self.general_frm)
+		self.img = ImageTk.PhotoImage(Image.open(r"E:\New Keonosis\Photos\General\keon_and_potatoes.jpg").resize((200, 200)))
+		self.pfp_lbl = tk.Label(self.pfp_frm, image=self.img)
+		self.pfp_lbl.pack(expand=True, fill='both')
+
+		self.pfp_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Name
-		self.name_frm = tk.Frame(master=self.general_frame)
+		self.name_frm = tk.Frame(master=self.general_frm)
 		self.lname_lbl = tk.Label(master=self.name_frm, text='Last Name')
 		self.lname_entry = tk.Entry(master=self.name_frm, relief='groove', bd=2)
 		self.fname_lbl = tk.Label(master=self.name_frm, text='First Name')
@@ -252,7 +261,7 @@ class ProfilePage(Page):
 		self.name_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Address
-		self.address_frm = tk.Frame(master=self.general_frame)
+		self.address_frm = tk.Frame(master=self.general_frm)
 		self.address_lbl = tk.Label(master=self.address_frm, text='Address')
 		self.address_entry = tk.Entry(master=self.address_frm, relief='groove', bd=2)
 
@@ -264,7 +273,7 @@ class ProfilePage(Page):
 		self.address_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Birthday
-		self.bday_frm = tk.Frame(master=self.general_frame)
+		self.bday_frm = tk.Frame(master=self.general_frm)
 		self.bday_lbl = tk.Label(master=self.bday_frm, text='Birthday')
 		self.bday_cbox = DateEntry(master=self.bday_frm, relief='groove', bd=2, state='readonly', 
 			firstweekday='sunday')
@@ -277,7 +286,7 @@ class ProfilePage(Page):
 		self.bday_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Contacts
-		self.contacts_frm = tk.Frame(master=self.general_frame)
+		self.contacts_frm = tk.Frame(master=self.general_frm)
 		self.email_lbl = tk.Label(master=self.contacts_frm, text='Email Address')
 		self.email_entry = tk.Entry(master=self.contacts_frm, relief='groove', bd=2)
 		self.contact_lbl = tk.Label(master=self.contacts_frm, text='Contact Number')
@@ -294,7 +303,7 @@ class ProfilePage(Page):
 		self.contacts_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Gender
-		self.gender_frm = tk.Frame(master=self.general_frame)
+		self.gender_frm = tk.Frame(master=self.general_frm)
 		self.gender_lbl = tk.Label(master=self.gender_frm, text='Gender / Sex')
 		self.gender_cbox = ttk.Combobox(master=self.gender_frm, state="readonly", values=self.GENDERS)
 
@@ -305,15 +314,22 @@ class ProfilePage(Page):
 
 		self.gender_frm.pack(fill='x', padx=10, pady=2)
 
-		self.general_frame.pack(expand=True, fill='both')
+		self.general_frm.pack(expand=True, fill='both')
 
-		self.tabmng.add(self.general_frame, text='General Information')
+		self.tabmng.add(self.general_frm, text='General Information')
 
-		self.save_btn = tk.Button(master=self, text='Save', height=2, 
+		#	Buttons
+		self.btns_frm = tk.Frame(self)
+		self.back_btn = tk.Button(master=self, text='Back', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.back)
+		self.edit_toggle_btn = tk.Button(master=self, text='Save', height=2, 
 			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
 			command=self.toggle_edit)
 
-		self.save_btn.pack(fill='x', padx=10, pady=10)
+		self.back_btn.pack(expand=True, fill='x', padx=(10, 5), pady=10, side='left')
+		self.edit_toggle_btn.pack(expand=True, fill='x', padx=(5, 10), pady=10, side='right')
+		self.btns_frm.pack()
 		
 		self.dynresize = DynamicResize(self.master)
 		self.dynresize.add_child(self.lname_lbl, 'Bahnschrift Light', 14, 16, 6)
@@ -332,7 +348,8 @@ class ProfilePage(Page):
 		self.dynresize.add_child(self.email_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.gender_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.gender_cbox, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.save_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.edit_toggle_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 14, 16, 6)
 
 		self.lname_entry_tooltip = Tooltip(self.lname_entry, text='Last Name')
 		self.fname_entry_tooltip = Tooltip(self.fname_entry, text='First Name')
@@ -342,7 +359,8 @@ class ProfilePage(Page):
 		self.contact_entry_tooltip = Tooltip(self.contact_entry, text='Contact Number, Optional')
 		self.email_entry_tooltip = Tooltip(self.email_entry, text='Email Address, Optional')
 		self.gender_cbox_tooltip = Tooltip(self.gender_cbox, text='Gender')
-		self.save_btn_tooltip = Tooltip(self.save_btn, text='Save the Profile')
+		self.edit_toggle_btn_tooltip = Tooltip(self.edit_toggle_btn, text='Save the Profile')
+		self.back_btn_tooltip = Tooltip(self.back_btn, text='Go Back to Menu')
 
 		#	Note: Call self.reload_page() on subclasses
 		self.master.protocol('WM_DELETE_WINDOW', self.exit)
@@ -370,7 +388,7 @@ class ProfilePage(Page):
 
 		return p
 	
-	def lock(self) -> None:
+	def lock(self, event=None) -> None:
 		"""Locks all of the widgets so they cannot be modified"""
 
 		self.lname_entry.config(state='disabled')
@@ -382,7 +400,22 @@ class ProfilePage(Page):
 		self.email_entry.config(state='disabled')
 		self.gender_cbox.config(state='disabled')
 		
-	def unlock(self) -> None:
+	def back(self, event=None) -> None:
+
+		if self.edit:
+			response = msgbox.askyesnocancel(self.master.settings.title, 
+				'Do you want to save the profile?')
+			if response == True:
+				self.edit = False
+			elif response == False:
+				pass
+			elif response is None:
+				return
+
+		self.master.pagemng.current_page = 'homepage'
+		self.master.pagemng.previous_page = None
+
+	def unlock(self, event=None) -> None:
 		"""Unlocks all of the widgets so they can be modified"""
 
 		self.lname_entry.config(state='normal')
@@ -438,7 +471,8 @@ class ProfilePage(Page):
 		self.gender_lbl.config(font=('Bahnschrift Light', 14))
 		self.gender_cbox.config(font=('Bahnschrift Light', 14))
 
-		self.save_btn.config(font=('Bahnschrift Light', 14))
+		self.edit_toggle_btn.config(font=('Bahnschrift Light', 14))
+		self.back_btn.config(font=('Bahnschrift Light', 14))
 
 		self.lname_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.fname_entry_tooltip.font = ('Bahnschrift Light', 10)
@@ -448,21 +482,22 @@ class ProfilePage(Page):
 		self.contact_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.email_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.gender_cbox_tooltip.font = ('Bahnschrift Light', 10)
-		self.save_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.edit_toggle_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.back_btn_tooltip.font = ('Bahnschrift Light', 10)
 
 		if self.edit:
-			self.save_btn.config(text='Save')
+			self.edit_toggle_btn.config(text='Save')
 		else:
-			self.save_btn.config(text='Edit')
+			self.edit_toggle_btn.config(text='Edit')
 	
-class StudentPfp(ProfilePage):
+class StudentProfilePage(ProfilePage):
 	GRADE_LVLS = ('Preparatory', 'Kinder I', 'Kinder II', 'Grade I', 'Grade II', 
 		'Grade III', 'Grade IV', 'Grade V', 'Grade VI')
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
 		#	Parents in General Frame
-		self.parents_frm = tk.Frame(master=self.general_frame)
+		self.parents_frm = tk.Frame(master=self.general_frm)
 		self.parents_lbl = tk.Label(master=self.parents_frm, text='Parents (Separate w/ Comma)')
 		self.parents_entry = tk.Entry(master=self.parents_frm, relief='groove', bd=2)
 
@@ -537,17 +572,17 @@ class StudentPfp(ProfilePage):
 
 		self.reload_page()
 	
-	def lock(self) -> None:
-		super().lock()
+	def lock(self, event=None) -> None:
+		super().lock(event)
 
 		self.parents_entry.config(state='disabled')
 		self.lrn_entry.config(state='disabled')
 		self.grade_cbox.config(state='disabled')
 		self.section_entry.config(state='disabled')
 
-	def unlock(self) -> None:
+	def unlock(self, event=None) -> None:
 
-		super().unlock()
+		super().unlock(event)
 
 		self.parents_entry.config(state='normal')
 		self.lrn_entry.config(state='normal')
@@ -575,7 +610,7 @@ class StudentPfp(ProfilePage):
 		self.grade_cbox_tooltip.font = ('Bahnschrift Light', 10)
 		self.section_entry_tooltip.font = ('Bahnschrift Light', 10)
 
-class TeacherPfp(ProfilePage):
+class TeacherProfilePage(ProfilePage):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
@@ -598,11 +633,31 @@ class TeacherPfp(ProfilePage):
 
 		self.tabmng.add(self.teacher_frm, text='Teacher\'s Information')
 
+		self.dynresize.add_child(self.advisorycls_entry, 'Bahnschrift Light', 14, 16, 6)
+
+		self.advisorycls_entry_tooltip = Tooltip(self.advisorycls_entry, text='Advisory Class, Optional')
+
 		self.reload_page()
+
+	def lock(self, event=None) -> None:
+
+		super().lock(event)
+
+		self.advisorycls_entry.config(state='disabled')
+
+	def unlock(self, event=None) -> None:
+		
+		super().unlock(event)
+
+		self.advisorycls_entry.config(state='normal')
 
 	def reload_page(self, event=None) -> None:
 
 		super().reload_page(event)
+
+		self.advisorycls_entry.config(font=('Bahnschrift Light', 14))
+
+		self.advisorycls_entry_tooltip.font = ('Bahnschrift Light', 10)
 
 class PageManager:
 	def __init__(self) -> None:
