@@ -5,6 +5,7 @@ import os
 import pickle
 from abc import ABC
 from datetime import date
+from PIL import ImageTk
 from typing import Dict, List, Literal, Tuple, Type, Union
 
 import constants
@@ -236,7 +237,8 @@ class Section(DataLoader):
 class Person(DataLoader):
 	def __init__(self, path: str, fname: str, lname: str, address: str, 
 		bday: date, sex: Literal['M', 'F'], contact_no: str=None, 
-		email: str=None, mname: str=None) -> None:
+		email: str=None, mname: str=None, picture: ImageTk.PhotoImage=None
+		) -> None:
 		super().__init__(path)
 		
 		self.fname: str = fname.title()
@@ -246,6 +248,7 @@ class Person(DataLoader):
 		self.bday: date = bday
 		self.contact_no: str = contact_no
 		self.email: str = email
+		self.picture: ImageTk.PhotoImage = picture
 		self.sex: Literal['M', 'F'] = sex.upper()
 
 	@property
@@ -288,10 +291,10 @@ class Student(Person):
 	def __init__(self, path: str, fname: str, lname: str, address: str, 
 		bday: date, grade: str, sex: Literal['M', 'F'], lrn: str, 
 		sy: Tuple[int, int], contact_no: str=None, email: str=None, 
-		mname: str=None, section: str=None, guardians: List[str]=None
-		) -> None:
+		mname: str=None, section: str=None, guardians: List[str]=None,
+		picture: ImageTk.PhotoImage=None) -> None:
 		super().__init__(path, fname, lname, address, bday, contact_no, sex, 
-			email, mname)
+			email, mname, picture)
 		
 		self.lrn: str = lrn
 		self.grade: str = grade
@@ -326,9 +329,10 @@ class Student(Person):
 class Teacher(Person):
 	def __init__(self, fname: str, lname: str, address: str, 
 		bday: date, contact_no: str, sex: Literal['M', 'F'], email: str=None, 
-		advisory_class: Section=None, mname: str=None) -> None:
+		advisory_class: Section=None, mname: str=None, picture: ImageTk.PhotoImage=None
+		) -> None:
 		super().__init__(fname, lname, address, bday, contact_no, sex, email, 
-			mname)
+			mname, picture)
 
 		self.advisory_class: Section = advisory_class
 

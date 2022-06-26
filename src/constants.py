@@ -3,6 +3,7 @@
 #   Libraries
 import os.path
 from enum import Enum
+from PIL import Image
 
 #   Code
 class DEFAULT_SETTINGS(Enum):
@@ -18,3 +19,5 @@ class PATHS(Enum):
 	STUDENTS: str = os.path.join('data', 'students')
 	TEACHERS: str = os.path.join('data', 'teachers')
 
+SUPPORTED_IMG_TYPES = tuple([[f'{f} File', ext] for ext
+	, f in Image.registered_extensions().items() if f in Image.OPEN])

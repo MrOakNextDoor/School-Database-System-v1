@@ -2,14 +2,16 @@
 
 #   Libraries
 import tkinter as tk
-from PIL import ImageTk, Image
 from abc import ABC, abstractmethod
 from datetime import date
+from PIL import ImageTk, Image
 from tkcalendar import DateEntry
+from tkinter import filedialog
 from tkinter import messagebox as msgbox
 from tkinter import ttk
 from typing import Any, Dict, Tuple
 
+import constants
 import data
 import misc
 
@@ -231,12 +233,15 @@ class ProfilePage(Page):
 		self.general_frm = tk.Frame(self)
 
 		#	Profile Pic
-		self.pfp_frm = tk.Frame(self.general_frm)
-		self.img = ImageTk.PhotoImage(Image.open(r"E:\New Keonosis\Photos\General\keon_and_potatoes.jpg").resize((200, 200)))
-		self.pfp_lbl = tk.Label(self.pfp_frm, image=self.img)
-		self.pfp_lbl.pack(expand=True, fill='both')
-
-		self.pfp_frm.pack(fill='x', padx=10, pady=2)
+		self.pic_frm = tk.Frame(self.general_frm)
+		self.inner_pic_frm = tk.Frame(self.pic_frm, width=150, height=150)
+		self.pic_btn = tk.Button(master=self.inner_pic_frm, text='Select Picture', 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.select_pic)
+		self.pic_btn.pack(expand=True, fill='both')
+		self.inner_pic_frm.pack()
+		self.inner_pic_frm.pack_propagate(False)
+		self.pic_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Name
 		self.name_frm = tk.Frame(master=self.general_frm)
@@ -447,6 +452,22 @@ class ProfilePage(Page):
 
 	def toggle_edit(self) -> None:
 		self.edit = not self.edit
+
+	def select_pic(self, event=None) -> None:
+
+		path = filedialog.askopenfilename(
+			filetypes=constants.SUPPORTED_IMG_TYPES)
+
+		try:
+			with Image.open(path) as img:
+				self.img = ImageTk.PhotoImage(img.resize((150, 150)))
+				print(type(self.img))
+				self.pic_btn.config(text='', image=self.img)
+		except AttributeError:
+			pass
+		except Exception:
+			msgbox.showerror(self.master.settings.title, 
+				'An error occured while processing your image.')
 
 	def reload_page(self, event=None) -> None:
 		
@@ -722,7 +743,7 @@ class PageManager:
 		except KeyError:
 			raise KeyError(f'Page \"{name}\" not found.')
 
-#   From Erik Bethke from:
+#   From Erik Bethke from
 #   https://stackoverflow.com/questions/3221966/how-do-i-display-tooltips-in-tkinter
 #   Though I have added some modifications
 #   TODO: 
