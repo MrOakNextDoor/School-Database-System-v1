@@ -172,16 +172,60 @@ class Section(DataLoader):
 	def path(self) -> str:
 		return self._path
 	
+	@property
+	def adviser(self) -> str:
+		return self._adviser
+
 	@path.setter
 	def path(self, value: str) -> None:
 		#   Prevents changing paths if given value is the same
 		if self._path != value:
-			#	Deletes the old file from the old path
-			os.remove(self._path)
 			#	Sets the new path
 			super().path = value
 			#	Then letting all the students and teachers know 
 			#	that the path has been changed
+
+			removed_teachers = []
+			removed_students = []
+
+			try:
+				adviser = Teacher.construct(self.adviser)
+				adviser.advisory_cls = self.path
+				adviser.dump()
+			except OSError:
+				self._adviser = None
+
+			for t in self.teachers:
+				try:
+					teacher = Teacher.construct(t)
+					teacher.advisory_cls = self.path
+					teacher.dump()
+				except OSError:
+					removed_teachers.append(t)
+
+			for s in self.students:
+				try:
+					student = Student.construct(s)
+					student.section = self.path
+					student.dump()
+				except OSError:
+					removed_students.append(s)
+
+			for t in removed_teachers:
+				try:
+					self.teachers.remove(t)
+				except ValueError:
+					continue
+
+			for s in removed_students:
+				try:
+					self.students.remove(s)
+				except ValueError:
+					continue
+
+	@adviser.setter
+	def adviser(self, value: str) -> None:
+		pass
 
 	def add(self, value: Union['Teacher', 'Student']) -> None:
 		
@@ -314,10 +358,10 @@ class Person(DataLoader):
 class Student(Person):
 	def __init__(self, path: str, pic: ImageTk.PhotoImage, 
 		fname: str, bday: date, address: str, 
-		sex: Literal['male', 'female'],lrn: str, 
-		sy: Tuple[int, int], contact_no: str=None, 
-		email: str=None, mname: str=None, 
-		lname: str=None) -> None:
+		sex: Literal['male', 'female'], lrn: str, 
+		sy: Tuple[int, int], section: str, 
+		contact_no: str=None, email: str=None, 
+		mname: str=None, lname: str=None) -> None:
 
 		super().__init__(path, pic, fname, bday, 
 		address, sex, contact_no, email, mname, 
@@ -325,6 +369,7 @@ class Student(Person):
 
 		self.lrn: str= lrn
 		self.sy: Tuple[int, int] = sy
+		self.section: str = section
 
 	def load(self) -> 'Student':
 
@@ -348,7 +393,7 @@ class Teacher(Person):
 	def __init__(self, path: str, pic: ImageTk.PhotoImage, 
 		fname: str, bday: date, address: str, 
 		sex: Literal['male', 'female'], 
-		advisory_cls: Section=None, contact_no: str=None, 
+		advisory_cls: str=None, contact_no: str=None, 
 		email: str=None, mname: str=None, lname: str=None
 		) -> None:
 
@@ -356,26 +401,4 @@ class Teacher(Person):
 		address, sex, contact_no, email, mname, 
 		lname)
 
-		self._advisory_cls: str = None
-
-		self.advisory_cls: str = advisory_cls
-
-	@property
-	def path(self) -> str:
-		return self._path
-
-	@property
-	def advisory_cls(self) -> Section:
-		pass
-
-	@path.setter
-	def path(self, value: str) -> None:
-		super().path = value
-		try:
-			Section.construct(self.advisory_cls)
-		except AttributeError:
-			return
-
-	@advisory_cls.setter
-	def advisory_cls(self, value: str) -> None:
-		pass
+		self.advisory_cls = advisory_cls
