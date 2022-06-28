@@ -19,5 +19,6 @@ class PATHS(Enum):
 	STUDENTS: str = os.path.join('data', 'students')
 	TEACHERS: str = os.path.join('data', 'teachers')
 
-SUPPORTED_IMG_TYPES = tuple([[f'{f} File', ext] for ext
-	, f in Image.registered_extensions().items() if f in Image.OPEN])
+SUPPORTED_IMG_TYPES = [[f'{f} File', ext] for ext
+	, f in Image.registered_extensions().items() if f in Image.OPEN]
+SUPPORTED_IMG_TYPES.insert(0, ['All Files', '*'])

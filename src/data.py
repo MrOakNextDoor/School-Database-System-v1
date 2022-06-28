@@ -6,10 +6,14 @@ import pickle
 from abc import ABC
 from datetime import date
 from PIL import ImageTk
-from typing import Dict, List, Literal, Tuple, Type, Union
+from typing import Dict, List, Literal, Type, Optional, Tuple, Union
 
 import constants
 
+#	TODO:
+#	- Do teacher advisory cls
+#	- Do section advisor
+#	- Do section path changing
 
 #   Code
 class DataLoader(ABC):
@@ -68,8 +72,7 @@ class DataLoader(ABC):
 				d: DataLoader = pickle.load(f, encoding='utf-8')
 		except OSError:
 			self.dump()
-			with open(self.path, 'rb') as f:
-				d: DataLoader = pickle.load(f, encoding='utf-8')
+			d = self
 		finally:
 			return d
 
@@ -157,193 +160,222 @@ class Settings(DataLoader):
 		self.title: str = constants.DEFAULT_SETTINGS.TITLE.value
 
 class Section(DataLoader):
-	def __init__(self, grade: int, name: str) -> None:
-		super().__init__(os.path.join(constants.PATHS.SECTIONS, 
-			f'G{grade}_{name.title().replace(" ", "")}'))
-		
-		self.adviser: str | Teacher = None
-		self.grade: int = grade
-		self.name: str = name.title().replace(' ', '')
-		self.students: Dict[str, Student] = {}
+	def __init__(self, path: str, name: str, adviser: str) -> None:
+		super().__init__(path)
+
+		self.name: str = name
+		self._adviser: str = adviser
+		self.teachers: List[str] = []
+		self.students: List[str] = []
 
 	@property
 	def path(self) -> str:
 		return self._path
-
+	
 	@path.setter
 	def path(self, value: str) -> None:
-		super().path = value
-		for student in self.students.values():
-			self.students[student].section = self.path
+		#   Prevents changing paths if given value is the same
+		if self._path != value:
+			#	Deletes the old file from the old path
+			os.remove(self._path)
+			#	Sets the new path
+			super().path = value
+			#	Then letting all the students and teachers know 
+			#	that the path has been changed
+
+	def add(self, value: Union['Teacher', 'Student']) -> None:
+		
+		if isinstance(value, Teacher):
+			if value.path not in self.teachers and not value.path == self.adviser.path:
+				self.teachers.append(value.path)
+		elif isinstance(value, Student):
+			if value.path not in self.students:
+				self.students.append(value.path)
+		else:
+			raise TypeError(f'Unsupported type: {type(value)}.')
+
+	def remove(self, value: Union['Teacher', 'Student']) -> None:
+
+		if isinstance(value, Teacher):
+			self.teachers.remove(value.path)
+		elif isinstance(value, Student):
+			self.students.remove(value.path)
+		else:
+			raise TypeError(f'Unsupported type: {type(value)}.')
 
 	def load(self) -> 'Section':
-		
+
 		d: Section = super().load()
 
-		self.adviser = d.adviser
-		self.grade = d.grade
 		self.name = d.name
+		self.adviser = d.adviser
+		self.teachers = d.teachers
 		self.students = d.students
-		
+
 		return d
 
 	def loads(self, s: bytes) -> 'Section':
 
 		d: Section = super().loads(s)
 
-		self.adviser = d.adviser
-		self.grade = d.grade
 		self.name = d.name
+		self.adviser = d.adviser
+		self.teachers = d.teachers
 		self.students = d.students
-		
+
 		return d
 
-	def add_student(self, student: 'Student', overwrite: bool=True) -> None:
-		"""Add a Student to the Section.
-
-		Args:
-			student (Student): The student to be added.
-			overwrite (bool, optional): Determines whether to overwrite an 
-			existing student or not.
-		"""
-		
-		if overwrite:
-			student.grade = self.grade
-			student.section = self.path
-			self.students[student.path] = student
-		else:
-			if student.path in self.students:
-				raise ValueError(
-					'Student already in students. Consider setting overwrite to True.')
-			else:
-				student.grade = self.grade
-				student.section = self.path
-				self.students[student.path] = student
-
-	def del_student(self, student: Union['Student', str]) -> None:
-
-		try:
-			if isinstance(student, str):
-				self.students[student].section = None
-				self.students.pop(student)
-			elif isinstance(student, Student):
-				self.students[student.path].section = None
-				self.students.pop(student.path)
-			else:
-				raise TypeError(f'Unsupported type \'{type(student)}\'')
-		except KeyError:
-			raise KeyError('Student not in students.')
-
 class Person(DataLoader):
-	def __init__(self, path: str, fname: str, lname: str, address: str, 
-		bday: date, sex: Literal['M', 'F'], contact_no: str=None, 
-		email: str=None, mname: str=None, picture: ImageTk.PhotoImage=None
-		) -> None:
+	def __init__(self, path: str, pic: ImageTk.PhotoImage, 
+		fname: str, bday: date, address: str, 
+		sex: Literal['male', 'female'], contact_no: str=None, 
+		email: str=None, mname: str=None, 
+		lname: str=None) -> None:
+
 		super().__init__(path)
 		
-		self.fname: str = fname.title()
-		self._mname: str = mname.title() if mname is not None else None
-		self.lname: str = lname.title()
-		self.address: str = address
+		self._lname: str = None
+		self._fname: str = None
+		self._mname: str = None
+
+		self.pic: ImageTk.PhotoImage = pic
+		self.lname: str = lname
+		self.fname: str = fname
+		self.mname: str = mname
 		self.bday: date = bday
+		self.address: str = address
+		self.sex: Literal['male', 'female'] = sex.lower()
 		self.contact_no: str = contact_no
 		self.email: str = email
-		self.picture: ImageTk.PhotoImage = picture
-		self.sex: Literal['M', 'F'] = sex.upper()
+
+	@property
+	def lname(self) -> str:
+		return self._lname
+
+	@property
+	def fname(self) -> str:
+		return self.fname
 
 	@property
 	def mname(self) -> str:
-		return self._mname
-	
+		return self.mname
+
+	@lname.setter
+	def lname(self, value: Optional[str]) -> None:
+		try:
+			self._lname = value.title()
+		except AttributeError:
+			return
+
+	@fname.setter
+	def fname(self, value: Optional[str]) -> None:
+		try:
+			self._fname = value.title()
+		except AttributeError:
+			return
+
 	@mname.setter
-	def mname(self, value: str) -> None:
-		self._mname = value.title() if value is not None else None
+	def mname(self, value: Optional[str]) -> None:
+		try:
+			self._mname = value.title()
+		except AttributeError:
+			return
 
 	def load(self) -> Type['Person']:
-
+		
 		d: Person = super().load()
 
+		self.lname = d.lname
 		self.fname = d.fname
 		self.mname = d.mname
-		self.lname = d.lname
-		self.address = d.address
 		self.bday = d.bday
+		self.address = d.address
+		self.sex = d.sex
 		self.contact_no = d.contact_no
 		self.email = d.email
-		self.sex = d.sex
-		
+
 		return d
 
 	def loads(self, s: bytes) -> Type['Person']:
 
-		d: Person = pickle.loads(s, encoding='utf-8')
+		d: Person = super().loads(s)
 
+		self.lname = d.lname
 		self.fname = d.fname
 		self.mname = d.mname
-		self.lname = d.lname
-		self.address = d.address
 		self.bday = d.bday
+		self.address = d.address
+		self.sex = d.sex
 		self.contact_no = d.contact_no
 		self.email = d.email
-		self.sex = d.sex
+
+		return d
 
 class Student(Person):
-	def __init__(self, path: str, fname: str, lname: str, address: str, 
-		bday: date, grade: str, sex: Literal['M', 'F'], lrn: str, 
-		sy: Tuple[int, int], contact_no: str=None, email: str=None, 
-		mname: str=None, section: str=None, guardians: List[str]=None,
-		picture: ImageTk.PhotoImage=None) -> None:
-		super().__init__(path, fname, lname, address, bday, contact_no, sex, 
-			email, mname, picture)
-		
-		self.lrn: str = lrn
-		self.grade: str = grade
-		self.guardians: List[str] = guardians
-		self.section: str = section
+	def __init__(self, path: str, pic: ImageTk.PhotoImage, 
+		fname: str, bday: date, address: str, 
+		sex: Literal['male', 'female'],lrn: str, 
+		sy: Tuple[int, int], contact_no: str=None, 
+		email: str=None, mname: str=None, 
+		lname: str=None) -> None:
+
+		super().__init__(path, pic, fname, bday, 
+		address, sex, contact_no, email, mname, 
+		lname)
+
+		self.lrn: str= lrn
 		self.sy: Tuple[int, int] = sy
 
 	def load(self) -> 'Student':
-		
+
 		d: Student = super().load()
 
-		self.grade = d.grade
 		self.lrn = d.lrn
-		self.guardians = d.guardians
-		self.section = d.section
 		self.sy = d.sy
 
 		return d
 
 	def loads(self, s: bytes) -> 'Student':
-		
-		d: Student = super().load(s)
 
-		self.grade = d.grade
+		d: Student = super().loads(s)
+
 		self.lrn = d.lrn
-		self.guardians = d.guardians
-		self.section = d.section
 		self.sy = d.sy
 
 		return d
 
 class Teacher(Person):
-	def __init__(self, fname: str, lname: str, address: str, 
-		bday: date, contact_no: str, sex: Literal['M', 'F'], email: str=None, 
-		advisory_class: Section=None, mname: str=None, picture: ImageTk.PhotoImage=None
+	def __init__(self, path: str, pic: ImageTk.PhotoImage, 
+		fname: str, bday: date, address: str, 
+		sex: Literal['male', 'female'], 
+		advisory_cls: Section=None, contact_no: str=None, 
+		email: str=None, mname: str=None, lname: str=None
 		) -> None:
-		super().__init__(fname, lname, address, bday, contact_no, sex, email, 
-			mname, picture)
 
-		self.advisory_class: Section = advisory_class
+		super().__init__(path, pic, fname, bday, 
+		address, sex, contact_no, email, mname, 
+		lname)
 
-	def load(self) -> 'Teacher':
+		self._advisory_cls: str = None
 
-		d: Teacher = super().load()
+		self.advisory_cls: str = advisory_cls
 
-		self.advisory_class = d.advisory_class
+	@property
+	def path(self) -> str:
+		return self._path
 
-	def loads(self, s: bytes) -> 'Teacher':
-		
-		d: Teacher = super().loads(s)
+	@property
+	def advisory_cls(self) -> Section:
+		pass
 
-		self.advisory_class = d.advisory_class
+	@path.setter
+	def path(self, value: str) -> None:
+		super().path = value
+		try:
+			Section.construct(self.advisory_cls)
+		except AttributeError:
+			return
+
+	@advisory_cls.setter
+	def advisory_cls(self, value: str) -> None:
+		pass

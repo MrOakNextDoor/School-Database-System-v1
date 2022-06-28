@@ -6,16 +6,13 @@ from abc import ABC, abstractmethod
 from datetime import date
 from PIL import ImageTk, Image
 from tkcalendar import DateEntry
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 from tkinter import messagebox as msgbox
-from tkinter import ttk
 from typing import Any, Dict, Tuple
 
 import constants
 import data
 import misc
-
-#	TODO: Add the one-window birthday entry
 
 #   Code
 class Page(ABC, tk.Frame):
@@ -215,11 +212,10 @@ class NewPage(Page):
 
 	def section(self) -> None:
 		
-		pass
+		self.master.pagemng.pages['pfppage'] = SectionProfilePage(self.master)
+		self.master.pagemng.current_page = 'pfppage'
 		
 class ProfilePage(Page):
-	MONTHS = ('January', 'February', 'March', 'April', 'May', 'June', 'July', 
-		'August', 'September', 'October', 'November', 'December')
 	GENDERS = ('Male', 'Female')
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
@@ -236,7 +232,7 @@ class ProfilePage(Page):
 		self.pic_frm = tk.Frame(self.general_frm)
 		self.inner_pic_frm = tk.Frame(self.pic_frm, width=150, height=150)
 		self.pic_btn = tk.Button(master=self.inner_pic_frm, text='Select Picture', 
-			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			relief='solid', bd=1, bg='#e6e6e6', activebackground='#ebebeb',
 			command=self.select_pic)
 		self.pic_btn.pack(expand=True, fill='both')
 		self.inner_pic_frm.pack()
@@ -337,6 +333,7 @@ class ProfilePage(Page):
 		self.btns_frm.pack()
 		
 		self.dynresize = DynamicResize(self.master)
+		self.dynresize.add_child(self.pic_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.lname_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.lname_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.fname_lbl, 'Bahnschrift Light', 14, 16, 6)
@@ -356,6 +353,7 @@ class ProfilePage(Page):
 		self.dynresize.add_child(self.edit_toggle_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 14, 16, 6)
 
+		self.pic_btn_tooltip = Tooltip(self.pic_btn, text='Click to Select Picture')
 		self.lname_entry_tooltip = Tooltip(self.lname_entry, text='Last Name')
 		self.fname_entry_tooltip = Tooltip(self.fname_entry, text='First Name')
 		self.mname_entry_tooltip = Tooltip(self.mname_entry, text='Full Middle Name, Optional')
@@ -384,26 +382,6 @@ class ProfilePage(Page):
 			self.save()
 
 		self.reload_page()
-
-	@staticmethod
-	def from_profile(master: tk.Widget, profile: data.Person) -> 'ProfilePage':
-		
-		p = ProfilePage(master)
-		p.edit = False
-
-		return p
-	
-	def lock(self, event=None) -> None:
-		"""Locks all of the widgets so they cannot be modified"""
-
-		self.lname_entry.config(state='disabled')
-		self.fname_entry.config(state='disabled')
-		self.mname_entry.config(state='disabled')
-		self.address_entry.config(state='disabled')
-		self.bday_cbox.config(state='disabled')
-		self.contact_entry.config(state='disabled')
-		self.email_entry.config(state='disabled')
-		self.gender_cbox.config(state='disabled')
 		
 	def back(self, event=None) -> None:
 
@@ -420,9 +398,21 @@ class ProfilePage(Page):
 		self.master.pagemng.current_page = 'homepage'
 		self.master.pagemng.previous_page = None
 
+	def lock(self, event=None) -> None:
+		"""Locks all of the widgets so they cannot be modified"""
+		
+		self.lname_entry.config(state='disabled')
+		self.fname_entry.config(state='disabled')
+		self.mname_entry.config(state='disabled')
+		self.address_entry.config(state='disabled')
+		self.bday_cbox.config(state='disabled')
+		self.contact_entry.config(state='disabled')
+		self.email_entry.config(state='disabled')
+		self.gender_cbox.config(state='disabled')
+
 	def unlock(self, event=None) -> None:
 		"""Unlocks all of the widgets so they can be modified"""
-
+		
 		self.lname_entry.config(state='normal')
 		self.fname_entry.config(state='normal')
 		self.mname_entry.config(state='normal')
@@ -455,13 +445,15 @@ class ProfilePage(Page):
 
 	def select_pic(self, event=None) -> None:
 
+		if not self.edit:
+			return
+
 		path = filedialog.askopenfilename(
 			filetypes=constants.SUPPORTED_IMG_TYPES)
 
 		try:
 			with Image.open(path) as img:
 				self.img = ImageTk.PhotoImage(img.resize((150, 150)))
-				print(type(self.img))
 				self.pic_btn.config(text='', image=self.img)
 		except AttributeError:
 			pass
@@ -471,6 +463,8 @@ class ProfilePage(Page):
 
 	def reload_page(self, event=None) -> None:
 		
+		self.pic_btn.config(font=('Bahnschrift Light', 14))
+
 		self.lname_lbl.config(font=('Bahnschrift Light', 14))
 		self.lname_entry.config(font=('Bahnschrift Light', 14))
 		self.fname_lbl.config(font=('Bahnschrift Light', 14))
@@ -495,6 +489,7 @@ class ProfilePage(Page):
 		self.edit_toggle_btn.config(font=('Bahnschrift Light', 14))
 		self.back_btn.config(font=('Bahnschrift Light', 14))
 
+		self.pic_btn_tooltip.font = ('Bahnschrift Light', 10)
 		self.lname_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.fname_entry_tooltip.font = ('Bahnschrift Light', 10)
 		self.mname_entry_tooltip.font = ('Bahnschrift Light', 10)
@@ -680,6 +675,26 @@ class TeacherProfilePage(ProfilePage):
 
 		self.advisorycls_entry_tooltip.font = ('Bahnschrift Light', 10)
 
+class SectionProfilePage(Page):
+	def __init__(self, master: tk.Widget) -> None:
+		super().__init__(master=master)
+
+		#	Tab Manager
+		self.tabmng = ttk.Notebook(master=self)
+		self.tabmng.pack(fill='both', expand=True)
+
+		#	General Frame
+		self.general_frm = tk.Frame(self)
+
+		self.general_frm.pack(expand=True, fill='both')
+
+		self.tabmng.add(self.general_frm, text='General Information')
+
+		self.dynresize = DynamicResize(self.master)
+
+	def reload_page(self, event=None) -> None:
+		pass
+	
 class PageManager:
 	def __init__(self) -> None:
 		
