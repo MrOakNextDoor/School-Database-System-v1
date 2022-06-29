@@ -331,7 +331,7 @@ class ProfilePage(Page):
 
 		self.back_btn.pack(expand=True, fill='x', padx=(10, 5), pady=10, side='left')
 		self.edit_toggle_btn.pack(expand=True, fill='x', padx=(5, 10), pady=10, side='right')
-		self.btns_frm.pack()
+		self.btns_frm.pack(fill='x')
 		
 		self.dynresize = DynamicResize(self.master)
 		self.dynresize.add_child(self.pic_btn, 'Bahnschrift Light', 14, 16, 6)
@@ -842,18 +842,84 @@ class SectionProfilePage(Page):
 		self.adviser_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Teacher List
-		self.teachers_lbl = tk.Label(master=self.general_frm, text='Teachers', justify='left')
-		self.teachers_frm = tk.Frame(self.general_frm)
-
+		self.teachers_lbl = tk.Label(master=self.general_frm, text='Teachers', anchor='w')
 		self.teachers_lbl.pack(fill='x', padx=10, pady=2)
+		self.teachers_frm = tk.Frame(self.general_frm)
+		self.inner_teachers_frm = tk.Frame(self.teachers_frm)
+		self.teachers_list_scrollbar = tk.Scrollbar(master=self.inner_teachers_frm)
+		self.teachers_list = tk.Listbox(master=self.inner_teachers_frm, yscrollcommand=self.teachers_list_scrollbar.set, 
+			relief='groove', bd=2)
+		self.teachers_list_scrollbar.config(command=self.teachers_list.yview)
+		for i in range(1, 101):
+			self.teachers_list.insert(tk.END, f'Keon Clone {i} as Teacher Keon {i}')
+		self.teachers_list_scrollbar.pack(fill='y', side='right')
+		self.teachers_list.pack(expand=True, fill='both', side='left')
+		self.teachers_btns_frm = tk.Frame(self.teachers_frm)
+		self.add_teacher_btn = tk.Button(master=self.teachers_btns_frm, text='Add', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.remove_teacher_btn = tk.Button(master=self.teachers_btns_frm, text='Remove', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.open_teacher_btn = tk.Button(master=self.teachers_btns_frm, text='Open', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		
+		self.add_teacher_btn.grid(column=0, row=0, sticky='nsew', padx=6, pady=2)
+		self.remove_teacher_btn.grid(column=1, row=0, sticky='nsew', padx=6, pady=2)
+		self.open_teacher_btn.grid(column=2, row=0, sticky='nsew', padx=6, pady=2)
+		self.teachers_btns_frm.columnconfigure(0, weight=1)
+		self.teachers_btns_frm.columnconfigure(1, weight=1)
+		self.teachers_btns_frm.columnconfigure(2, weight=1)
+		self.inner_teachers_frm.pack(fill='x', padx=10, pady=2)
+		self.teachers_btns_frm.pack(fill='x', padx=10, pady=2)
+		self.teachers_frm.pack(fill='x', padx=10, pady=2)
 
+		#	Student List
+		self.student_lbl = tk.Label(master=self.general_frm, text='Students', anchor='w')
+		self.student_lbl.pack(fill='x', padx=10, pady=2)
 		self.student_frm = tk.Frame(self.general_frm)
+		self.inner_student_frm = tk.Frame(self.student_frm)
+		self.student_list_scrollbar = tk.Scrollbar(master=self.inner_student_frm)
+		self.student_list = tk.Listbox(master=self.inner_student_frm, yscrollcommand=self.student_list_scrollbar.set, 
+			relief='groove', bd=2)
+		self.student_list_scrollbar.config(command=self.student_list.yview)
+		for i in range(1, 101):
+			self.student_list.insert(tk.END, f'Keon Clone {i} as Student Keon {i}')
+		self.student_list_scrollbar.pack(fill='y', side='right')
+		self.student_list.pack(expand=True, fill='both', side='left')
+		self.student_btns_frm = tk.Frame(self.student_frm)
+		self.add_student_btn = tk.Button(master=self.student_btns_frm, text='Add', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.remove_student_btn = tk.Button(master=self.student_btns_frm, text='Remove', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.open_student_btn = tk.Button(master=self.student_btns_frm, text='Open', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		
+		self.add_student_btn.grid(column=0, row=0, sticky='nsew', padx=6, pady=2)
+		self.remove_student_btn.grid(column=1, row=0, sticky='nsew', padx=6, pady=2)
+		self.open_student_btn.grid(column=2, row=0, sticky='nsew', padx=6, pady=2)
+		self.student_btns_frm.columnconfigure(0, weight=1)
+		self.student_btns_frm.columnconfigure(1, weight=1)
+		self.student_btns_frm.columnconfigure(2, weight=1)
+		self.inner_student_frm.pack(fill='x', padx=10, pady=2)
+		self.student_btns_frm.pack(fill='x', padx=10, pady=2)
+		self.student_frm.pack(fill='x', padx=10, pady=2)
 
 		self.general_frm.pack(expand=True, fill='both')
-
 		self.tabmng.add(self.general_frm, text='General Information')
 
+		self.btns_frm = tk.Frame(self)
+		self.back_btn = tk.Button(master=self, text='Back', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.edit_toggle_btn = tk.Button(master=self, text='Save', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+
+		self.back_btn.pack(expand=True, fill='x', padx=(10, 5), pady=10, side='left')
+		self.edit_toggle_btn.pack(expand=True, fill='x', padx=(5, 10), pady=10, side='right')
+		self.btns_frm.pack(fill='x')
+
 		self.dynresize = DynamicResize(self.master)
+
+		self.edit_toggle_btn_tooltip = Tooltip(self.edit_toggle_btn, text='Save the Profile')
+		self.back_btn_tooltip = Tooltip(self.back_btn, text='Go Back to Menu')
 
 	def reload_page(self, event=None) -> None:
 		pass
