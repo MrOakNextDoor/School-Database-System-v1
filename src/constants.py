@@ -19,6 +19,11 @@ class PATHS(Enum):
 	STUDENTS: str = os.path.join('data', 'students')
 	TEACHERS: str = os.path.join('data', 'teachers')
 
+class FILENAME_FORMATS(Enum):
+	STUDENT: str = 'student_{lname}_{fname}_{mname}.pickle'
+	TEACHER: str = 'teacher_{lname}_{fname}_{mname}.pickle'
+	SECTION: str = 'section_{glvl}_{name}.pickle'
+
 SUPPORTED_IMG_TYPES = [[f'{f} File', ext] for ext
 	, f in Image.registered_extensions().items() if f in Image.OPEN]
 SUPPORTED_IMG_TYPES.insert(0, ['All Files', '*'])

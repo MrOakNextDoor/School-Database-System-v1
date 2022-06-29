@@ -2,8 +2,8 @@
 
 #   Libraries
 import tkinter as tk
+import os
 from abc import ABC, abstractmethod
-from datetime import date
 from PIL import ImageTk, Image
 from tkcalendar import DateEntry
 from tkinter import filedialog, ttk
@@ -276,7 +276,7 @@ class ProfilePage(Page):
 
 		#	Birthday
 		self.bday_frm = tk.Frame(master=self.general_frm)
-		self.bday_lbl = tk.Label(master=self.bday_frm, text='Birthday')
+		self.bday_lbl = tk.Label(master=self.bday_frm, text='Date of Birth')
 		self.bday_entry = DateEntry(master=self.bday_frm, relief='groove', bd=2, state='readonly', 
 			firstweekday='sunday')
 
@@ -375,11 +375,14 @@ class ProfilePage(Page):
 
 	@edit.setter
 	def edit(self, value: bool) -> None:
-		self._edit = value
-		if self.edit:
+		if value:
 			self.unlock()
+			self._edit = value
 		else:
-			self.save()
+			if self.save():
+				self._edit = value
+			else:
+				return
 
 		self.reload_page()
 	
@@ -511,6 +514,8 @@ class StudentProfilePage(ProfilePage):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
+		self.active_profile = None
+
 		#	Parents in General Frame
 		self.parents_frm = tk.Frame(master=self.general_frm)
 		self.parents_lbl = tk.Label(master=self.parents_frm, text='Parents (Separate w/ Comma)')
@@ -563,6 +568,23 @@ class StudentProfilePage(ProfilePage):
 		
 		self.student_frm.pack(expand=True, fill='both')
 
+		#	School Year
+		self.sy_frm = tk.Frame(master=self.student_frm)
+		self.sy1_lbl = tk.Label(master=self.sy_frm, text='School Year (From)')
+		self.sy_from_entry = tk.Entry(master=self.sy_frm, relief='groove', bd=2)
+		self.sy2_lbl = tk.Label(master=self.sy_frm, text='School Year (To)')
+		self.sy_to_entry = tk.Entry(master=self.sy_frm, relief='groove', bd=2)
+
+		self.sy1_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy_from_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy2_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy_to_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		
+		self.sy_frm.columnconfigure(1, weight=1)
+		self.sy_frm.columnconfigure(4, weight=1)
+
+		self.sy_frm.pack(fill='x', padx=10, pady=2)
+
 		#	Grades Frame
 		self.grades_frm = tk.Frame(master=self)
 
@@ -579,6 +601,10 @@ class StudentProfilePage(ProfilePage):
 		self.dynresize.add_child(self.grade_cbox, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.section_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.section_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy1_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy_from_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy2_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy_to_entry, 'Bahnschrift Light', 14, 16, 6)
 
 		self.parent_entry_tooltip = Tooltip(self.parents_entry, text='Parents, Separate w/ Comma, Optional')
 		self.lrn_entry_tooltip = Tooltip(self.lrn_entry, text='Learner\'s Reference Number')
@@ -587,7 +613,7 @@ class StudentProfilePage(ProfilePage):
 
 		self.reload_page()
 	
-	def save(self) -> None:
+	def save(self) -> bool:
 
 		required = {
 			'Picture': misc.convert_blank(self.img_path),
@@ -595,31 +621,44 @@ class StudentProfilePage(ProfilePage):
 			'Address': misc.convert_blank(self.address_entry.get()),
 			'Gender': misc.convert_blank(self.gender_cbox.get()),
 			'Learner\'s Reference Number': misc.convert_blank(self.lrn_entry.get()),
-			'Section': misc.convert_blank(self.section_entry.get())
+			'Section': misc.convert_blank(self.section_entry.get()),
+			'School Year (From)': misc.convert_blank(self.sy_from_entry.get()),
+			'School Year (To)': misc.convert_blank(self.sy_to_entry.get()),
 		}
 
-		for key, data in required.items():
-			if data is None:
+		for key, info in required.items():
+			if info is None:
 				msgbox.showerror(self.master.settings.title, f'{key} required.')
-				return
+				return False
+		try:
+			if os.path.exists(self.active_profile.path):
+				os.remove(self.active_profile.path)
+		except AttributeError:
+			pass
 
-		student = data.Student(
-			'data/teststudent.pickle', 
+		self.active_profile = data.Student(
+			os.path.join(constants.PATHS.STUDENTS.value,
+				constants.FILENAME_FORMATS.STUDENT.value.format(
+					lname=self.lname_entry.get(),
+					fname=required['First Name'],
+					mname=self.mname_entry.get())), 
 			required['Picture'], 
 			required['First Name'],
 			self.bday_entry.get_date(),
 			required['Address'],
 			required['Gender'],
 			required['Learner\'s Reference Number'],
-			[2022, 2023],
+			(required['School Year (From)'], required['School Year (To)']),
 			required['Section'],
 			self.contact_entry.get(),
 			self.email_entry.get(),
 			self.mname_entry.get(),
 			self.lname_entry.get())
-		student.dump()
+		self.active_profile.dump()
 
 		super().save()
+
+		return True
 
 	def lock(self, event=None) -> None:
 		super().lock(event)
@@ -628,6 +667,8 @@ class StudentProfilePage(ProfilePage):
 		self.lrn_entry.config(state='disabled')
 		self.grade_cbox.config(state='disabled')
 		self.section_entry.config(state='disabled')
+		self.sy_from_entry.config(state='disabled')
+		self.sy_to_entry.config(state='disabled')
 
 	def unlock(self, event=None) -> None:
 
@@ -637,6 +678,8 @@ class StudentProfilePage(ProfilePage):
 		self.lrn_entry.config(state='normal')
 		self.grade_cbox.config(state='readonly')
 		self.section_entry.config(state='normal')
+		self.sy_from_entry.config(state='normal')
+		self.sy_to_entry.config(state='normal')
 
 	def reload_page(self, event=None) -> None:
 
@@ -653,6 +696,11 @@ class StudentProfilePage(ProfilePage):
 
 		self.section_lbl.config(font=('Bahnschrift Light', 14))
 		self.section_entry.config(font=('Bahnschrift Light', 14))
+
+		self.sy1_lbl.config(font=('Bahnschrift Light', 14))
+		self.sy_from_entry.config(font=('Bahnschrift Light', 14))
+		self.sy2_lbl.config(font=('Bahnschrift Light', 14))
+		self.sy_to_entry.config(font=('Bahnschrift Light', 14))
 		
 		self.parent_entry_tooltip.font = ('Bahnschrift Light', 10) 
 		self.lrn_entry_tooltip.font = ('Bahnschrift Light', 10)
@@ -689,7 +737,45 @@ class TeacherProfilePage(ProfilePage):
 		self.reload_page()
 
 	def save(self) -> None:
-		pass
+		required = {
+			'Picture': misc.convert_blank(self.img_path),
+			'First Name': misc.convert_blank(self.fname_entry.get()),
+			'Address': misc.convert_blank(self.address_entry.get()),
+			'Gender': misc.convert_blank(self.gender_cbox.get()),
+			'Advisory Class': misc.convert_blank(self.advisorycls_entry.get()),
+		}
+
+		for key, info in required.items():
+			if info is None:
+				msgbox.showerror(self.master.settings.title, f'{key} required.')
+				return False
+		try:
+			if os.path.exists(self.active_profile.path):
+				os.remove(self.active_profile.path)
+		except AttributeError:
+			pass
+
+		self.active_profile = data.Teacher(
+			os.path.join(constants.PATHS.TEACHERS.value,
+				constants.FILENAME_FORMATS.TEACHER.value.format(
+					lname=self.lname_entry.get(),
+					fname=required['First Name'],
+					mname=self.mname_entry.get())), 
+			required['Picture'], 
+			required['First Name'],
+			self.bday_entry.get_date(),
+			required['Address'],
+			required['Gender'],
+			required['Advisory Class'],
+			self.contact_entry.get(),
+			self.email_entry.get(),
+			self.mname_entry.get(),
+			self.lname_entry.get())
+		self.active_profile.dump()
+
+		super().save()
+
+		return True
 
 	def lock(self, event=None) -> None:
 
@@ -721,6 +807,47 @@ class SectionProfilePage(Page):
 
 		#	General Frame
 		self.general_frm = tk.Frame(self)
+
+		#	Section Name
+		self.name_frm = tk.Frame(self.general_frm)
+		self.name_lbl = tk.Label(master=self.name_frm, text='Section Name')
+		self.name_entry = tk.Entry(master=self.name_frm, relief='groove', bd=2)
+
+		self.name_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.name_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.name_frm.columnconfigure(1, weight=1)
+		self.name_frm.pack(fill='x', padx=10, pady=2)
+		
+		#	Grade Level
+		self.grade_frm = tk.Frame(master=self.general_frm)
+		self.grade_lbl = tk.Label(master=self.grade_frm, text='Grade Level')
+		self.grade_cbox = ttk.Combobox(master=self.grade_frm, state="readonly", values=constants.GRADE_LVLS)
+
+		self.grade_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.grade_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.grade_frm.columnconfigure(1, weight=1)
+		self.grade_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Adviser
+		self.adviser_frm = tk.Frame(self.general_frm)
+		self.adviser_lbl = tk.Label(master=self.adviser_frm, text='Adviser')
+		self.adviser_entry = tk.Entry(master=self.adviser_frm, relief='groove', bd=2)
+
+		self.adviser_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.adviser_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.adviser_frm.columnconfigure(1, weight=1)
+		self.adviser_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Teacher List
+		self.teachers_lbl = tk.Label(master=self.general_frm, text='Teachers', justify='left')
+		self.teachers_frm = tk.Frame(self.general_frm)
+
+		self.teachers_lbl.pack(fill='x', padx=10, pady=2)
+
+		self.student_frm = tk.Frame(self.general_frm)
 
 		self.general_frm.pack(expand=True, fill='both')
 
