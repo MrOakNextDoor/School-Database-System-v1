@@ -216,7 +216,6 @@ class NewPage(Page):
 		self.master.pagemng.current_page = 'pfppage'
 		
 class ProfilePage(Page):
-	GENDERS = ('Male', 'Female')
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
@@ -229,6 +228,8 @@ class ProfilePage(Page):
 		self.general_frm = tk.Frame(self)
 
 		#	Profile Pic
+		self.img = None
+		self.img_path = None
 		self.pic_frm = tk.Frame(self.general_frm)
 		self.inner_pic_frm = tk.Frame(self.pic_frm, width=150, height=150)
 		self.pic_btn = tk.Button(master=self.inner_pic_frm, text='Select Picture', 
@@ -276,11 +277,11 @@ class ProfilePage(Page):
 		#	Birthday
 		self.bday_frm = tk.Frame(master=self.general_frm)
 		self.bday_lbl = tk.Label(master=self.bday_frm, text='Birthday')
-		self.bday_cbox = DateEntry(master=self.bday_frm, relief='groove', bd=2, state='readonly', 
+		self.bday_entry = DateEntry(master=self.bday_frm, relief='groove', bd=2, state='readonly', 
 			firstweekday='sunday')
 
 		self.bday_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.bday_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.bday_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 
 		self.bday_frm.columnconfigure(1, weight=1)
 
@@ -306,7 +307,7 @@ class ProfilePage(Page):
 		#	Gender
 		self.gender_frm = tk.Frame(master=self.general_frm)
 		self.gender_lbl = tk.Label(master=self.gender_frm, text='Gender / Sex')
-		self.gender_cbox = ttk.Combobox(master=self.gender_frm, state="readonly", values=self.GENDERS)
+		self.gender_cbox = ttk.Combobox(master=self.gender_frm, state='readonly', values=constants.GENDERS)
 
 		self.gender_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.gender_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
@@ -343,7 +344,7 @@ class ProfilePage(Page):
 		self.dynresize.add_child(self.address_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.address_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.bday_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.bday_cbox, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.bday_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.contact_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.contact_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.email_lbl, 'Bahnschrift Light', 14, 16, 6)
@@ -358,7 +359,7 @@ class ProfilePage(Page):
 		self.fname_entry_tooltip = Tooltip(self.fname_entry, text='First Name')
 		self.mname_entry_tooltip = Tooltip(self.mname_entry, text='Full Middle Name, Optional')
 		self.address_entry_tooltip = Tooltip(self.address_entry, text='Address')
-		self.bday_entry_tooltip = Tooltip(self.bday_cbox, text='Birthday in MM/DD/YYYY format')
+		self.bday_entry_tooltip = Tooltip(self.bday_entry, text='Birthday in MM/DD/YYYY format')
 		self.contact_entry_tooltip = Tooltip(self.contact_entry, text='Contact Number, Optional')
 		self.email_entry_tooltip = Tooltip(self.email_entry, text='Email Address, Optional')
 		self.gender_cbox_tooltip = Tooltip(self.gender_cbox, text='Gender')
@@ -378,11 +379,16 @@ class ProfilePage(Page):
 		if self.edit:
 			self.unlock()
 		else:
-			self.lock()
 			self.save()
 
 		self.reload_page()
+	
+	def save(self) -> None:
 		
+		#	Do some saving of the info here
+
+		self.lock()
+
 	def back(self, event=None) -> None:
 
 		if self.edit:
@@ -405,7 +411,7 @@ class ProfilePage(Page):
 		self.fname_entry.config(state='disabled')
 		self.mname_entry.config(state='disabled')
 		self.address_entry.config(state='disabled')
-		self.bday_cbox.config(state='disabled')
+		self.bday_entry.config(state='disabled')
 		self.contact_entry.config(state='disabled')
 		self.email_entry.config(state='disabled')
 		self.gender_cbox.config(state='disabled')
@@ -417,7 +423,7 @@ class ProfilePage(Page):
 		self.fname_entry.config(state='normal')
 		self.mname_entry.config(state='normal')
 		self.address_entry.config(state='normal')
-		self.bday_cbox.config(state='readonly')
+		self.bday_entry.config(state='readonly')
 		self.contact_entry.config(state='normal')
 		self.email_entry.config(state='normal')
 		self.gender_cbox.config(state='normal')
@@ -435,11 +441,6 @@ class ProfilePage(Page):
 
 		self.master.exit()
 
-	def save(self) -> None:
-		
-		#	Do some saving of the info here
-		pass
-
 	def toggle_edit(self) -> None:
 		self.edit = not self.edit
 
@@ -448,11 +449,11 @@ class ProfilePage(Page):
 		if not self.edit:
 			return
 
-		path = filedialog.askopenfilename(
+		self.img_path = filedialog.askopenfilename(
 			filetypes=constants.SUPPORTED_IMG_TYPES)
 
 		try:
-			with Image.open(path) as img:
+			with Image.open(self.img_path) as img:
 				self.img = ImageTk.PhotoImage(img.resize((150, 150)))
 				self.pic_btn.config(text='', image=self.img)
 		except AttributeError:
@@ -476,7 +477,7 @@ class ProfilePage(Page):
 		self.address_entry.config(font=('Bahnschrift Light', 14))
 
 		self.bday_lbl.config(font=('Bahnschrift Light', 14))
-		self.bday_cbox.config(font=('Bahnschrift Light', 14))
+		self.bday_entry.config(font=('Bahnschrift Light', 14))
 
 		self.contact_lbl.config(font=('Bahnschrift Light', 14))
 		self.contact_entry.config(font=('Bahnschrift Light', 14))
@@ -507,8 +508,6 @@ class ProfilePage(Page):
 			self.edit_toggle_btn.config(text='Edit')
 	
 class StudentProfilePage(ProfilePage):
-	GRADE_LVLS = ('Preparatory', 'Kinder I', 'Kinder II', 'Grade I', 'Grade II', 
-		'Grade III', 'Grade IV', 'Grade V', 'Grade VI')
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
@@ -541,7 +540,7 @@ class StudentProfilePage(ProfilePage):
 		#	Grade Level
 		self.grade_frm = tk.Frame(master=self.student_frm)
 		self.grade_lbl = tk.Label(master=self.grade_frm, text='Grade Level')
-		self.grade_cbox = ttk.Combobox(master=self.grade_frm, state="readonly", values=self.GRADE_LVLS)
+		self.grade_cbox = ttk.Combobox(master=self.grade_frm, state="readonly", values=constants.GRADE_LVLS)
 
 		self.grade_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.grade_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
@@ -588,6 +587,40 @@ class StudentProfilePage(ProfilePage):
 
 		self.reload_page()
 	
+	def save(self) -> None:
+
+		required = {
+			'Picture': misc.convert_blank(self.img_path),
+			'First Name': misc.convert_blank(self.fname_entry.get()),
+			'Address': misc.convert_blank(self.address_entry.get()),
+			'Gender': misc.convert_blank(self.gender_cbox.get()),
+			'Learner\'s Reference Number': misc.convert_blank(self.lrn_entry.get()),
+			'Section': misc.convert_blank(self.section_entry.get())
+		}
+
+		for key, data in required.items():
+			if data is None:
+				msgbox.showerror(self.master.settings.title, f'{key} required.')
+				return
+
+		student = data.Student(
+			'data/teststudent.pickle', 
+			required['Picture'], 
+			required['First Name'],
+			self.bday_entry.get_date(),
+			required['Address'],
+			required['Gender'],
+			required['Learner\'s Reference Number'],
+			[2022, 2023],
+			required['Section'],
+			self.contact_entry.get(),
+			self.email_entry.get(),
+			self.mname_entry.get(),
+			self.lname_entry.get())
+		student.dump()
+
+		super().save()
+
 	def lock(self, event=None) -> None:
 		super().lock(event)
 
@@ -654,6 +687,9 @@ class TeacherProfilePage(ProfilePage):
 		self.advisorycls_entry_tooltip = Tooltip(self.advisorycls_entry, text='Advisory Class, Optional')
 
 		self.reload_page()
+
+	def save(self) -> None:
+		pass
 
 	def lock(self, event=None) -> None:
 

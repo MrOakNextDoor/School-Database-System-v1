@@ -22,3 +22,6 @@ class PATHS(Enum):
 SUPPORTED_IMG_TYPES = [[f'{f} File', ext] for ext
 	, f in Image.registered_extensions().items() if f in Image.OPEN]
 SUPPORTED_IMG_TYPES.insert(0, ['All Files', '*'])
+GRADE_LVLS = ('Preparatory', 'Kinder I', 'Kinder II', 'Grade I', 'Grade II', 
+	'Grade III', 'Grade IV', 'Grade V', 'Grade VI')
+GENDERS = ('Male', 'Female')

@@ -164,68 +164,9 @@ class Section(DataLoader):
 		super().__init__(path)
 
 		self.name: str = name
-		self._adviser: str = adviser
+		self.adviser: str = adviser
 		self.teachers: List[str] = []
 		self.students: List[str] = []
-
-	@property
-	def path(self) -> str:
-		return self._path
-	
-	@property
-	def adviser(self) -> str:
-		return self._adviser
-
-	@path.setter
-	def path(self, value: str) -> None:
-		#   Prevents changing paths if given value is the same
-		if self._path != value:
-			#	Sets the new path
-			super().path = value
-			#	Then letting all the students and teachers know 
-			#	that the path has been changed
-
-			removed_teachers = []
-			removed_students = []
-
-			try:
-				adviser = Teacher.construct(self.adviser)
-				adviser.advisory_cls = self.path
-				adviser.dump()
-			except OSError:
-				self._adviser = None
-
-			for t in self.teachers:
-				try:
-					teacher = Teacher.construct(t)
-					teacher.advisory_cls = self.path
-					teacher.dump()
-				except OSError:
-					removed_teachers.append(t)
-
-			for s in self.students:
-				try:
-					student = Student.construct(s)
-					student.section = self.path
-					student.dump()
-				except OSError:
-					removed_students.append(s)
-
-			for t in removed_teachers:
-				try:
-					self.teachers.remove(t)
-				except ValueError:
-					continue
-
-			for s in removed_students:
-				try:
-					self.students.remove(s)
-				except ValueError:
-					continue
-
-	@adviser.setter
-	def adviser(self, value: str) -> None:
-		pass
 
 	def add(self, value: Union['Teacher', 'Student']) -> None:
 		
@@ -270,7 +211,7 @@ class Section(DataLoader):
 		return d
 
 class Person(DataLoader):
-	def __init__(self, path: str, pic: ImageTk.PhotoImage, 
+	def __init__(self, path: str, pic: str, 
 		fname: str, bday: date, address: str, 
 		sex: Literal['male', 'female'], contact_no: str=None, 
 		email: str=None, mname: str=None, 
@@ -281,8 +222,8 @@ class Person(DataLoader):
 		self._lname: str = None
 		self._fname: str = None
 		self._mname: str = None
-
-		self.pic: ImageTk.PhotoImage = pic
+		
+		self.pic: str = pic
 		self.lname: str = lname
 		self.fname: str = fname
 		self.mname: str = mname
@@ -303,7 +244,7 @@ class Person(DataLoader):
 	@property
 	def mname(self) -> str:
 		return self.mname
-
+	
 	@lname.setter
 	def lname(self, value: Optional[str]) -> None:
 		try:
@@ -356,10 +297,10 @@ class Person(DataLoader):
 		return d
 
 class Student(Person):
-	def __init__(self, path: str, pic: ImageTk.PhotoImage, 
+	def __init__(self, path: str, pic: str, 
 		fname: str, bday: date, address: str, 
 		sex: Literal['male', 'female'], lrn: str, 
-		sy: Tuple[int, int], section: str, 
+		sy: Tuple[int, int], section: str=None, 
 		contact_no: str=None, email: str=None, 
 		mname: str=None, lname: str=None) -> None:
 
@@ -390,15 +331,15 @@ class Student(Person):
 		return d
 
 class Teacher(Person):
-	def __init__(self, path: str, pic: ImageTk.PhotoImage, 
+	def __init__(self, path: str, pic: str, 
 		fname: str, bday: date, address: str, 
 		sex: Literal['male', 'female'], 
-		advisory_cls: str=None, contact_no: str=None, 
+		section: str=None, contact_no: str=None, 
 		email: str=None, mname: str=None, lname: str=None
 		) -> None:
 
 		super().__init__(path, pic, fname, bday, 
 		address, sex, contact_no, email, mname, 
 		lname)
-
-		self.advisory_cls = advisory_cls
+		
+		self.section: str = section
