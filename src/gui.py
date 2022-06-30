@@ -800,122 +800,84 @@ class TeacherProfilePage(ProfilePage):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
-		self.active_profile = None
-		self.section_path = None
+		self.teacher_frm = tk.Frame(self)
 
-		#	Teacher Frame
-		self.teacher_frm = tk.Frame(master=self)
+		#	Advisory Section Input:
+		self.advisorycls_input_frm = tk.Frame(self.teacher_frm)
+		self.advisorycls_input_lbl = tk.Label(master=self.advisorycls_input_frm, text='Advisory Class')
+		self.advisorycls_input_entry = tk.Entry(master=self.advisorycls_input_frm, relief='groove', bd=2)
 
-		#	Advisory Class
-		self.advisorycls_frm = tk.Frame(master=self.teacher_frm)
-		self.advisorycls_lbl = tk.Label(master=self.advisorycls_frm, text='Advisory Class')
-		self.advisorycls_entry = tk.Entry(master=self.advisorycls_frm, relief='groove', bd=2)
+		self.advisorycls_input_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.advisorycls_input_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.advisorycls_input_frm.columnconfigure(1, weight=1)
+		self.advisorycls_input_frm.pack(fill='x', padx=10, pady=2)
 
-		self.advisorycls_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.advisorycls_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		#	Section
+		self.section_frm = tk.Frame(self.teacher_frm)
 
-		self.advisorycls_frm.columnconfigure(1, weight=1)
+		#	Input for the sections
+		self.section_input_frm = tk.Frame(self.section_frm)
+		self.section_input_lbl = tk.Label(master=self.section_input_frm, text='Section')
+		self.section_input_entry = tk.Entry(master=self.section_input_frm, relief='groove', bd=2)
 
-		self.advisorycls_frm.pack(fill='x', padx=10, pady=2)
+		self.section_input_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.section_input_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.section_input_frm.columnconfigure(1, weight=1)
 
-		#	Sections
-		self.sections_frm = tk.Frame(master=self.teacher_frm)
-		self.sections_lbl = tk.Label(master=self.sections_frm, text='Advisory Class')
-		self.sections_entry = tk.Entry(master=self.sections_frm, relief='groove', bd=2)
+		self.inner_section_frm = tk.Frame(self.section_frm)
+		self.section_list_scrollbar = tk.Scrollbar(master=self.inner_section_frm)
+		self.section_list = tk.Listbox(master=self.inner_section_frm, yscrollcommand=self.section_list_scrollbar.set, 
+			relief='groove', bd=2)
+		self.section_list_scrollbar.config(command=self.section_list.yview)
+		for i in range(1, 101):
+			self.section_list.insert(tk.END, f'Section No. {i}')
+		self.section_list_scrollbar.pack(fill='y', side='right')
+		self.section_list.pack(expand=True, fill='both', side='left')
 
-		self.sections_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.sections_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.section_btns_frm = tk.Frame(self.section_frm)
+		self.add_section_btn = tk.Button(master=self.section_btns_frm, text='Add', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.remove_section_btn = tk.Button(master=self.section_btns_frm, text='Remove', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.open_section_btn = tk.Button(master=self.section_btns_frm, text='Open', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
 
-		self.sections_frm.columnconfigure(1, weight=1)
+		self.add_section_btn.grid(column=0, row=0, sticky='nsew', padx=6, pady=2)
+		self.remove_section_btn.grid(column=1, row=0, sticky='nsew', padx=6, pady=2)
+		self.open_section_btn.grid(column=2, row=0, sticky='nsew', padx=6, pady=2)
+		self.section_btns_frm.columnconfigure(0, weight=1)
+		self.section_btns_frm.columnconfigure(1, weight=1)
+		self.section_btns_frm.columnconfigure(2, weight=1)
 
-		self.sections_frm.pack(fill='x', padx=10, pady=2)
+		self.section_input_frm.pack(fill='x', pady=2)
+		self.inner_section_frm.pack(fill='x', pady=2)
+		self.section_btns_frm.pack(fill='x', pady=2)
+		self.section_frm.pack(fill='x', padx=10, pady=2)
 
 		self.teacher_frm.pack(expand=True, fill='both')
 
 		self.tabmng.add(self.teacher_frm, text='Teacher\'s Information')
 
-		self.dynresize.add_child(self.advisorycls_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.advisorycls_entry, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.sections_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.sections_entry, 'Bahnschrift Light', 14, 16, 6)
-
-		self.advisorycls_entry_tt = Tooltip(self.advisorycls_entry, text='Advisory Class, Optional')
-		self.sections_entry_tt = Tooltip(self.sections_entry, text='Sections Handled by the Teacher, Separate with Comma, Optional')
-
-		self.reload_page()
-
-	def save(self) -> None:
-		required = {
-			'Picture': misc.convert_blank(self.img_path),
-			'First Name': misc.convert_blank(self.fname_entry.get()),
-			'Address': misc.convert_blank(self.address_entry.get()),
-			'Gender': misc.convert_blank(self.gender_cbox.get())
-		}
-
-		for key, info in required.items():
-			if info is None:
-				msgbox.showerror(constants.TITLE, f'{key} required.')
-				return False
-
-		if self.active_profile is None:
-			self.active_profile = data.Teacher(
-			os.path.join(constants.PATHS.TEACHERS.value,
-				constants.FILENAME_FORMATS.TEACHER.value.format(
-					lname=self.lname_entry.get().replace(' ', ''),
-					fname=required['First Name'].replace(' ', ''),
-					mname=self.mname_entry.get().replace(' ', ''))), 
-			required['Picture'], 
-			required['First Name'],
-			self.bday_entry.get_date(),
-			required['Address'],
-			required['Gender'],
-			required['Advisory Class'],
-			self.sections_entry.get().split(','),
-			self.contact_entry.get(),
-			self.email_entry.get(),
-			self.mname_entry.get(),
-			self.lname_entry.get())
-		else:
-			self.active_profile.path = os.path.join(constants.PATHS.STUDENTS.value,
-					constants.FILENAME_FORMATS.STUDENT.value.format(
-						lname=self.lname_entry.get().replace(' ', ''),
-						fname=required['First Name'].replace(' ', ''),
-						mname=self.mname_entry.get().replace(' ', '')))
-			self.active_profile.pic = required['Picture']
-			self.active_profile.fname = required['First Name']
-			self.active_profile.bday = self.bday_entry.get_date()
-			self.active_profile.address = required['Address']
-			self.active_profile.sex = required['Gender']
-			self.active_profile.section = required['Advisory Class']
-			self.active_profile.contact_no = misc.convert_blank(self.contact_entry.get())
-			self.active_profile.email = misc.convert_blank(self.email_entry.get())
-			self.active_profile.mname = misc.convert_blank(self.mname_entry.get())
-			self.active_profile.lname = misc.convert_blank(self.lname_entry.get())
-		self.active_profile.dump()
-
-		super().save()
-
-		return True
+		self.dynresize.add_child(self.advisorycls_input_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.advisorycls_input_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.section_input_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.section_input_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.section_list, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.add_section_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.remove_section_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.open_section_btn, 'Bahnschrift Light', 14, 16, 6)
 
 	def lock(self, event=None) -> None:
 
 		super().lock(event)
 
-		self.advisorycls_entry.config(state='disabled')
-
 	def unlock(self, event=None) -> None:
 		
 		super().unlock(event)
 
-		self.advisorycls_entry.config(state='normal')
-
 	def reload_page(self, event=None) -> None:
 
 		super().reload_page(event)
-
-		self.advisorycls_entry.config(font=('Bahnschrift Light', 14))
-
-		self.advisorycls_entry_tt.font = ('Bahnschrift Light', 10)
 
 class SectionProfilePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
