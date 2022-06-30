@@ -18,7 +18,7 @@ import misc
 class Page(ABC, tk.Frame):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
-		self.parent = master
+		self.master = master
 		self._visible = False
 
 	@property
@@ -74,14 +74,16 @@ class HomePage(Page):
 			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
 			command=self.new)
 		self.open_btn = tk.Button(master=self.inner_r_frm, text='Open', height=3, 
-			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.open)
 		self.open_recent_btn = tk.Button(master=self.inner_r_frm, text='Open Recent', 
-			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.open_recent)
 		self.more_btn = tk.Button(master=self.inner_r_frm, text='More Actions', 
 			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
 		self.exit_btn = tk.Button(master=self.inner_r_frm, text='Exit', height=3, 
 			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
-			command=self.parent.exit)
+			command=self.master.exit)
 		self.new_btn.pack(expand=True, fill='x', padx=6, pady=(20, 2))
 		self.open_btn.pack(expand=True, fill='x', padx=6, pady=2)
 		self.open_recent_btn.pack(expand=True, fill='x', padx=6, pady=2)
@@ -137,7 +139,14 @@ class HomePage(Page):
 		self.exit_btn_tt.font = ('Bahnschrift Light', 10)
 
 	def new(self, event=None) -> None:
-		self.parent.pagemng.current_page = 'newpage'
+		self.master.pagemng.current_page = 'newpage'
+
+	def open(self, event=None) -> None:
+		self.master.pagemng.current_page = 'openpage'
+
+	def open_recent(self, event=None) -> None:
+		# self.master.pagemng.current_page = 
+		pass
 
 class NewPage(Page):
 	def __init__(self, master: tk.Widget) -> None:
@@ -164,6 +173,13 @@ class NewPage(Page):
 		self.back_btn.pack(expand=True, fill='x', padx=10, pady=(10, 0))
 		self.inner_frm.pack(expand=True, fill='x', padx=30)
 
+		self.dynresize = DynamicResize(self)
+		self.dynresize.add_child(self.title, 'Bahnschrift', 36, 40, 10)
+		self.dynresize.add_child(self.student_btn, 'Bahnschrift Light', 16, 20, 6)
+		self.dynresize.add_child(self.teacher_btn, 'Bahnschrift Light', 16, 20, 6)
+		self.dynresize.add_child(self.section_btn, 'Bahnschrift Light', 16, 20, 6)
+		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 16, 20, 6)
+
 		self.student_btn_tt = Tooltip(self.student_btn, 
 			text='Create a New Student Profile', font=('Bahnschrift Light', 10))
 		self.teacher_btn_tt = Tooltip(self.teacher_btn, 
@@ -172,13 +188,6 @@ class NewPage(Page):
 			text='Create a New Section', font=('Bahnschrift Light', 10))
 		self.back_btn_tt = Tooltip(self.back_btn, 
 			text='Go Back to Previous Page', font=('Bahnschrift Light', 10))
-
-		self.dynresize = DynamicResize(self)
-		self.dynresize.add_child(self.title, 'Bahnschrift', 36, 40, 10)
-		self.dynresize.add_child(self.student_btn, 'Bahnschrift Light', 16, 20, 6)
-		self.dynresize.add_child(self.teacher_btn, 'Bahnschrift Light', 16, 20, 6)
-		self.dynresize.add_child(self.section_btn, 'Bahnschrift Light', 16, 20, 6)
-		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 16, 20, 6)
 
 		self.reload_page()
 
@@ -198,7 +207,7 @@ class NewPage(Page):
 
 	def back(self) -> None:
 
-		self.parent.pagemng.back()
+		self.master.pagemng.back()
 
 	def student(self) -> None:
 		
@@ -214,7 +223,38 @@ class NewPage(Page):
 		
 		self.master.pagemng.pages['pfppage'] = SectionProfilePage(self.master)
 		self.master.pagemng.current_page = 'pfppage'
-		
+
+class OpenPage(Page):
+	def __init__(self, master: tk.Widget) -> None:
+		super().__init__(master=master)
+
+		self.inner_frm = tk.Frame(master=self)
+		self.title = tk.Label(master=self.inner_frm, text='Open a Profile')
+		self.back_btn = tk.Button(master=self.inner_frm, text='Back', 
+
+			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.back)
+
+		self.title.pack(expand=True, fill='x', side='top', pady=10)
+		self.back_btn.pack(expand=True, fill='x', padx=10, pady=(10, 0))
+
+		self.dynresize = DynamicResize(self)
+		self.dynresize.add_child(self.title, 'Bahnschrift', 36, 40, 10)
+		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 16, 20, 6)
+
+		self.back_btn_tt = Tooltip(self.back_btn, 
+			text='Go Back to Previous Page', font=('Bahnschrift Light', 10))
+		self.inner_frm.pack(expand=True, fill='x', padx=30)
+
+		self.reload_page()
+
+	def reload_page(self, event=None) -> None:
+		pass
+
+	def back(self) -> None:
+
+		self.master.pagemng.back()
+
 class ProfilePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
@@ -355,7 +395,7 @@ class ProfilePage(Page):
 		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 14, 16, 6)
 
 		self.pic_btn_tt = Tooltip(self.pic_btn, text='Click to Select Picture')
-		self.lname_entry_tt = Tooltip(self.lname_entry, text='Last Name')
+		self.lname_entry_tt = Tooltip(self.lname_entry, text='Last Name, Optional')
 		self.fname_entry_tt = Tooltip(self.fname_entry, text='First Name')
 		self.mname_entry_tt = Tooltip(self.mname_entry, text='Full Middle Name, Optional')
 		self.address_entry_tt = Tooltip(self.address_entry, text='Address')
@@ -395,7 +435,7 @@ class ProfilePage(Page):
 	def back(self, event=None) -> None:
 
 		if self.edit:
-			response = msgbox.askyesnocancel(self.master.settings.title, 
+			response = msgbox.askyesnocancel(constants.TITLE, 
 				'Do you want to save the profile?')
 			if response == True:
 				self.edit = False
@@ -433,7 +473,7 @@ class ProfilePage(Page):
 
 	def exit(self) -> None:
 		if self.edit:
-			response = msgbox.askyesnocancel(self.master.settings.title, 
+			response = msgbox.askyesnocancel(constants.TITLE, 
 				'Do you want to save the profile?')
 			if response == True:
 				self.edit = False
@@ -462,7 +502,7 @@ class ProfilePage(Page):
 		except AttributeError:
 			pass
 		except Exception:
-			msgbox.showerror(self.master.settings.title, 
+			msgbox.showerror(constants.TITLE, 
 				'An error occured while processing your image.')
 
 	def reload_page(self, event=None) -> None:
@@ -518,7 +558,7 @@ class StudentProfilePage(ProfilePage):
 
 		#	Parents in General Frame
 		self.parents_frm = tk.Frame(master=self.general_frm)
-		self.parents_lbl = tk.Label(master=self.parents_frm, text='Parents (Separate w/ Comma)')
+		self.parents_lbl = tk.Label(master=self.parents_frm, text='Parents/Guardians (Separate w/ Comma)')
 		self.parents_entry = tk.Entry(master=self.parents_frm, relief='groove', bd=2)
 
 		self.parents_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
@@ -620,15 +660,15 @@ class StudentProfilePage(ProfilePage):
 			'First Name': misc.convert_blank(self.fname_entry.get()),
 			'Address': misc.convert_blank(self.address_entry.get()),
 			'Gender': misc.convert_blank(self.gender_cbox.get()),
+			'Parents': misc.convert_blank(self.parents_entry.get()),
 			'Learner\'s Reference Number': misc.convert_blank(self.lrn_entry.get()),
-			'Section': misc.convert_blank(self.section_entry.get()),
 			'School Year (From)': misc.convert_blank(self.sy_from_entry.get()),
 			'School Year (To)': misc.convert_blank(self.sy_to_entry.get()),
 		}
 
 		for key, info in required.items():
 			if info is None:
-				msgbox.showerror(self.master.settings.title, f'{key} required.')
+				msgbox.showerror(constants.TITLE, f'{key} required.')
 				return False
 		try:
 			if os.path.exists(self.active_profile.path):
@@ -639,9 +679,9 @@ class StudentProfilePage(ProfilePage):
 		self.active_profile = data.Student(
 			os.path.join(constants.PATHS.STUDENTS.value,
 				constants.FILENAME_FORMATS.STUDENT.value.format(
-					lname=self.lname_entry.get(),
-					fname=required['First Name'],
-					mname=self.mname_entry.get())), 
+					lname=self.lname_entry.get().replace(' ', ''),
+					fname=required['First Name'].replace(' ', ''),
+					mname=self.mname_entry.get().replace(' ', ''))), 
 			required['Picture'], 
 			required['First Name'],
 			self.bday_entry.get_date(),
@@ -649,11 +689,12 @@ class StudentProfilePage(ProfilePage):
 			required['Gender'],
 			required['Learner\'s Reference Number'],
 			(required['School Year (From)'], required['School Year (To)']),
-			required['Section'],
-			self.contact_entry.get(),
-			self.email_entry.get(),
-			self.mname_entry.get(),
-			self.lname_entry.get())
+			required['Parents'].split(','),
+			misc.convert_blank(self.section_entry.get()),
+			misc.convert_blank(self.contact_entry.get()),
+			misc.convert_blank(self.email_entry.get()),
+			misc.convert_blank(self.mname_entry.get()),
+			misc.convert_blank(self.lname_entry.get()))
 		self.active_profile.dump()
 
 		super().save()
@@ -747,7 +788,7 @@ class TeacherProfilePage(ProfilePage):
 
 		for key, info in required.items():
 			if info is None:
-				msgbox.showerror(self.master.settings.title, f'{key} required.')
+				msgbox.showerror(constants.TITLE, f'{key} required.')
 				return False
 		try:
 			if os.path.exists(self.active_profile.path):
@@ -758,9 +799,9 @@ class TeacherProfilePage(ProfilePage):
 		self.active_profile = data.Teacher(
 			os.path.join(constants.PATHS.TEACHERS.value,
 				constants.FILENAME_FORMATS.TEACHER.value.format(
-					lname=self.lname_entry.get(),
-					fname=required['First Name'],
-					mname=self.mname_entry.get())), 
+					lname=self.lname_entry.get().replace(' ', ''),
+					fname=required['First Name'].replace(' ', ''),
+					mname=self.mname_entry.get().replace(' ', ''))), 
 			required['Picture'], 
 			required['First Name'],
 			self.bday_entry.get_date(),

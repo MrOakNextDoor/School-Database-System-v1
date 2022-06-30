@@ -3,7 +3,7 @@
 #   Libraries
 import os
 import pickle
-from abc import ABC
+from abc import ABC, abstractmethod
 from datetime import date
 from PIL import ImageTk
 from typing import Dict, List, Literal, Type, Optional, Tuple, Union
@@ -101,63 +101,6 @@ class DataLoader(ABC):
 		"""
 
 		return pickle.dumps(self)
-
-class AppState(DataLoader):
-	def __init__(self) -> None:
-		super().__init__(constants.PATHS.APPSTATE.value)
-		
-		self.current_page = None
-		self.previous_page = None
-
-	def load(self) -> 'AppState':
-
-		d: AppState = super().load()
-
-		self.current_page = d.current_page
-		self.previous_page = d.previous_page
-
-		return d
-
-	def loads(self, s: bytes) -> 'AppState':
-
-		d: AppState = super().loads(s)
-
-		self.current_page = d.current_page
-		self.previous_page = d.previous_page
-
-		return d
-
-class Settings(DataLoader):
-	def __init__(self) -> None:
-		super().__init__(os.path.join(constants.PATHS.SETTINGS.value))
-
-		self.expand: bool = constants.DEFAULT_SETTINGS.EXPAND.value
-		self.restore_last: bool = constants.DEFAULT_SETTINGS.RESTORE_LAST.value
-		self.title: str = constants.DEFAULT_SETTINGS.TITLE.value
-
-	def load(self) -> 'Settings':
-		
-		d: Settings = super().load()
-
-		self.expand = d.expand
-		self.restore_last = d.restore_last
-		self.title = d.title
-
-		return d
-
-	def loads(self, s: bytes) -> 'Settings':
-
-		d: Settings = super().loads(s)
-
-		self.expand = d.expand
-		self.restore_last = d.restore_last
-		self.title = d.title
-
-		return d
-
-	def restore_defaults(self) -> None:
-		self.restore_last: bool = constants.DEFAULT_SETTINGS.RESTORE_LAST.value
-		self.title: str = constants.DEFAULT_SETTINGS.TITLE.value
 
 class Section(DataLoader):
 	def __init__(self, path: str, name: str, adviser: str) -> None:
@@ -300,15 +243,17 @@ class Student(Person):
 	def __init__(self, path: str, pic: str, 
 		fname: str, bday: date, address: str, 
 		sex: Literal['male', 'female'], lrn: str, 
-		sy: Tuple[int, int], section: str=None, 
-		contact_no: str=None, email: str=None, 
-		mname: str=None, lname: str=None) -> None:
+		sy: Tuple[int, int], parents: List[str], 
+		section: str=None, contact_no: str=None, 
+		email: str=None, mname: str=None, 
+		lname: str=None) -> None:
 
 		super().__init__(path, pic, fname, bday, 
 		address, sex, contact_no, email, mname, 
 		lname)
 
-		self.lrn: str= lrn
+		self.parents: List[str] = parents
+		self.lrn: str = lrn
 		self.sy: Tuple[int, int] = sy
 		self.section: str = section
 
@@ -316,8 +261,10 @@ class Student(Person):
 
 		d: Student = super().load()
 
+		self.parents = d.parents
 		self.lrn = d.lrn
 		self.sy = d.sy
+		self.section = d.section
 
 		return d
 
@@ -325,8 +272,10 @@ class Student(Person):
 
 		d: Student = super().loads(s)
 
+		self.parents = d.parents
 		self.lrn = d.lrn
 		self.sy = d.sy
+		self.section = d.section
 
 		return d
 
@@ -343,3 +292,31 @@ class Teacher(Person):
 		lname)
 		
 		self.section: str = section
+
+class PathLoader(ABC):
+	def __init__(self, path: str) -> None:
+		self.path: str = path
+		self.items: List[Type['DataLoader']] = []
+
+	def get_all(self) -> List[str]:
+		return [f for f in os.listdir(self.path) if f.endswith('.pkl')]
+
+	@abstractmethod
+	def load(self) -> None:
+		for path in self.get_all():
+			self.items.append(DataLoader.construct(os.path.join(self.path, path)))
+
+class SectionLoader(PathLoader):
+	def load(self) -> None:
+		for path in self.get_all():
+			self.items.append(Section.construct(os.path.join(self.path, path)))
+
+class StudentLoader(PathLoader):
+	def load(self) -> None:
+		for path in self.get_all():
+			self.items.append(Student.construct(os.path.join(self.path, path)))
+
+class TeacherLoader(PathLoader):
+	def load(self) -> None:
+		for path in self.get_all():
+			self.items.append(Teacher.construct(os.path.join(self.path, path)))
