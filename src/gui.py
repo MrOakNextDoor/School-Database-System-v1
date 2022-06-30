@@ -426,7 +426,7 @@ class ProfilePage(Page):
 
 		self.reload_page()
 	
-	def save(self) -> None:
+	def save(self) -> bool:
 		
 		#	Do some saving of the info here
 
@@ -443,6 +443,8 @@ class ProfilePage(Page):
 				pass
 			elif response is None:
 				return
+
+		self.master.protocol('WM_DELETE_WINDOW', self.master.exit)
 
 		self.master.pagemng.current_page = 'homepage'
 		self.master.pagemng.previous_page = None
@@ -471,7 +473,7 @@ class ProfilePage(Page):
 		self.email_entry.config(state='normal')
 		self.gender_cbox.config(state='normal')
 
-	def exit(self) -> None:
+	def exit(self, event=None) -> None:
 		if self.edit:
 			response = msgbox.askyesnocancel(constants.TITLE, 
 				'Do you want to save the profile?')
@@ -555,6 +557,7 @@ class StudentProfilePage(ProfilePage):
 		super().__init__(master=master)
 
 		self.active_profile = None
+		self.section_path = None
 
 		#	Parents in General Frame
 		self.parents_frm = tk.Frame(master=self.general_frm)
@@ -585,7 +588,7 @@ class StudentProfilePage(ProfilePage):
 		#	Grade Level
 		self.grade_frm = tk.Frame(master=self.student_frm)
 		self.grade_lbl = tk.Label(master=self.grade_frm, text='Grade Level')
-		self.grade_cbox = ttk.Combobox(master=self.grade_frm, state="readonly", values=constants.GRADE_LVLS)
+		self.grade_cbox = ttk.Combobox(master=self.grade_frm, state='readonly', values=constants.GRADE_LVLS)
 
 		self.grade_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.grade_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
@@ -596,7 +599,7 @@ class StudentProfilePage(ProfilePage):
 
 		#	Section
 		self.section_frm = tk.Frame(master=self.student_frm)
-		self.section_lbl = tk.Label(master=self.section_frm, text='Section')
+		self.section_lbl = tk.Label(master=self.section_frm, text='Section, Optional')
 		self.section_entry = tk.Entry(master=self.section_frm, relief='groove', bd=2)
 
 		self.section_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
@@ -650,6 +653,8 @@ class StudentProfilePage(ProfilePage):
 		self.lrn_entry_tt = Tooltip(self.lrn_entry, text='Learner\'s Reference Number')
 		self.grade_cbox_tt = Tooltip(self.grade_cbox, text='Grade Level')
 		self.section_entry_tt = Tooltip(self.section_entry, text='Section / Class Name, Optional')
+		
+		self.section_entry.bind('<Button-1>', self.section_link)
 
 		self.reload_page()
 	
@@ -664,37 +669,67 @@ class StudentProfilePage(ProfilePage):
 			'Learner\'s Reference Number': misc.convert_blank(self.lrn_entry.get()),
 			'School Year (From)': misc.convert_blank(self.sy_from_entry.get()),
 			'School Year (To)': misc.convert_blank(self.sy_to_entry.get()),
+			'Grade Level': misc.convert_blank(self.grade_cbox.get())
 		}
 
 		for key, info in required.items():
 			if info is None:
 				msgbox.showerror(constants.TITLE, f'{key} required.')
 				return False
-		try:
-			if os.path.exists(self.active_profile.path):
-				os.remove(self.active_profile.path)
-		except AttributeError:
-			pass
 
-		self.active_profile = data.Student(
-			os.path.join(constants.PATHS.STUDENTS.value,
-				constants.FILENAME_FORMATS.STUDENT.value.format(
-					lname=self.lname_entry.get().replace(' ', ''),
-					fname=required['First Name'].replace(' ', ''),
-					mname=self.mname_entry.get().replace(' ', ''))), 
-			required['Picture'], 
-			required['First Name'],
-			self.bday_entry.get_date(),
-			required['Address'],
-			required['Gender'],
-			required['Learner\'s Reference Number'],
-			(required['School Year (From)'], required['School Year (To)']),
-			required['Parents'].split(','),
-			misc.convert_blank(self.section_entry.get()),
-			misc.convert_blank(self.contact_entry.get()),
-			misc.convert_blank(self.email_entry.get()),
-			misc.convert_blank(self.mname_entry.get()),
-			misc.convert_blank(self.lname_entry.get()))
+		section = misc.convert_blank(self.section_entry.get())
+		self.section_path = None
+		if section is not None:
+			sections = {section.name: section.path for section in \
+				self.master.sectionloader.items if section.grade_lvl == required['Grade Level']}
+			try:
+				self.section_path = sections[section]
+			except KeyError:
+				msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
+				return
+
+		if self.active_profile is None:
+			self.active_profile = data.Student(
+				os.path.join(constants.PATHS.STUDENTS.value,
+					constants.FILENAME_FORMATS.STUDENT.value.format(
+						lname=self.lname_entry.get().replace(' ', ''),
+						fname=required['First Name'].replace(' ', ''),
+						mname=self.mname_entry.get().replace(' ', ''))), 
+				required['Picture'], 
+				required['First Name'],
+				self.bday_entry.get_date(),
+				required['Address'],
+				required['Gender'],
+				required['Learner\'s Reference Number'],
+				(required['School Year (From)'], required['School Year (To)']),
+				required['Parents'].split(','),
+				required['Grade Level'],
+				self.section_path,
+				misc.convert_blank(self.contact_entry.get()),
+				misc.convert_blank(self.email_entry.get()),
+				misc.convert_blank(self.mname_entry.get()),
+				misc.convert_blank(self.lname_entry.get()))
+		else:
+			self.active_profile.path = os.path.join(constants.PATHS.STUDENTS.value,
+					constants.FILENAME_FORMATS.STUDENT.value.format(
+						lname=self.lname_entry.get().replace(' ', ''),
+						fname=required['First Name'].replace(' ', ''),
+						mname=self.mname_entry.get().replace(' ', '')))
+			self.active_profile.pic = required['Picture']
+			self.active_profile.fname = required['First Name']
+			self.active_profile.bday = self.bday_entry.get_date()
+			self.active_profile.address = required['Address']
+			self.active_profile.sex = required['Gender']
+			self.active_profile.lrn = required['Learner\'s Reference Number']
+			self.active_profile.sy = (required['School Year (From)'], 
+				required['School Year (To)'])
+			self.active_profile.grade_lvl = required['Grade Level']
+			self.active_profile.section = self.section_path
+			self.active_profile.contact_no = misc.convert_blank(self.contact_entry.get())
+			self.active_profile.email = misc.convert_blank(self.email_entry.get())
+			self.active_profile.mname = misc.convert_blank(self.mname_entry.get())
+			self.active_profile.lname = misc.convert_blank(self.lname_entry.get())
+			
 		self.active_profile.dump()
 
 		super().save()
@@ -747,15 +782,31 @@ class StudentProfilePage(ProfilePage):
 		self.lrn_entry_tt.font = ('Bahnschrift Light', 10)
 		self.grade_cbox_tt.font = ('Bahnschrift Light', 10)
 		self.section_entry_tt.font = ('Bahnschrift Light', 10)
+		if self.edit:
+			self.section_entry_tt.text = 'Section, Optional'
+		else:
+			self.section_entry_tt.text = 'Section, Click to Open'
+
+	def section_link(self, event=None) -> None:
+		
+		if not self.edit and self.section_path is not None:
+			if os.path.exists(self.section_path):
+				self.master.protocol('WM_DELETE_WINDOW', self.master.exit)
+
+				self.master.pagemng.current_page = 'homepage'
+				self.master.pagemng.previous_page = None
 
 class TeacherProfilePage(ProfilePage):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
+		self.active_profile = None
+		self.section_path = None
+
 		#	Teacher Frame
 		self.teacher_frm = tk.Frame(master=self)
 
-		#	Learners Reference Number
+		#	Advisory Class
 		self.advisorycls_frm = tk.Frame(master=self.teacher_frm)
 		self.advisorycls_lbl = tk.Label(master=self.advisorycls_frm, text='Advisory Class')
 		self.advisorycls_entry = tk.Entry(master=self.advisorycls_frm, relief='groove', bd=2)
@@ -767,13 +818,29 @@ class TeacherProfilePage(ProfilePage):
 
 		self.advisorycls_frm.pack(fill='x', padx=10, pady=2)
 
+		#	Sections
+		self.sections_frm = tk.Frame(master=self.teacher_frm)
+		self.sections_lbl = tk.Label(master=self.sections_frm, text='Advisory Class')
+		self.sections_entry = tk.Entry(master=self.sections_frm, relief='groove', bd=2)
+
+		self.sections_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sections_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.sections_frm.columnconfigure(1, weight=1)
+
+		self.sections_frm.pack(fill='x', padx=10, pady=2)
+
 		self.teacher_frm.pack(expand=True, fill='both')
 
 		self.tabmng.add(self.teacher_frm, text='Teacher\'s Information')
 
+		self.dynresize.add_child(self.advisorycls_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.advisorycls_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sections_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sections_entry, 'Bahnschrift Light', 14, 16, 6)
 
 		self.advisorycls_entry_tt = Tooltip(self.advisorycls_entry, text='Advisory Class, Optional')
+		self.sections_entry_tt = Tooltip(self.sections_entry, text='Sections Handled by the Teacher, Separate with Comma, Optional')
 
 		self.reload_page()
 
@@ -782,21 +849,16 @@ class TeacherProfilePage(ProfilePage):
 			'Picture': misc.convert_blank(self.img_path),
 			'First Name': misc.convert_blank(self.fname_entry.get()),
 			'Address': misc.convert_blank(self.address_entry.get()),
-			'Gender': misc.convert_blank(self.gender_cbox.get()),
-			'Advisory Class': misc.convert_blank(self.advisorycls_entry.get()),
+			'Gender': misc.convert_blank(self.gender_cbox.get())
 		}
 
 		for key, info in required.items():
 			if info is None:
 				msgbox.showerror(constants.TITLE, f'{key} required.')
 				return False
-		try:
-			if os.path.exists(self.active_profile.path):
-				os.remove(self.active_profile.path)
-		except AttributeError:
-			pass
 
-		self.active_profile = data.Teacher(
+		if self.active_profile is None:
+			self.active_profile = data.Teacher(
 			os.path.join(constants.PATHS.TEACHERS.value,
 				constants.FILENAME_FORMATS.TEACHER.value.format(
 					lname=self.lname_entry.get().replace(' ', ''),
@@ -808,10 +870,27 @@ class TeacherProfilePage(ProfilePage):
 			required['Address'],
 			required['Gender'],
 			required['Advisory Class'],
+			self.sections_entry.get().split(','),
 			self.contact_entry.get(),
 			self.email_entry.get(),
 			self.mname_entry.get(),
 			self.lname_entry.get())
+		else:
+			self.active_profile.path = os.path.join(constants.PATHS.STUDENTS.value,
+					constants.FILENAME_FORMATS.STUDENT.value.format(
+						lname=self.lname_entry.get().replace(' ', ''),
+						fname=required['First Name'].replace(' ', ''),
+						mname=self.mname_entry.get().replace(' ', '')))
+			self.active_profile.pic = required['Picture']
+			self.active_profile.fname = required['First Name']
+			self.active_profile.bday = self.bday_entry.get_date()
+			self.active_profile.address = required['Address']
+			self.active_profile.sex = required['Gender']
+			self.active_profile.section = required['Advisory Class']
+			self.active_profile.contact_no = misc.convert_blank(self.contact_entry.get())
+			self.active_profile.email = misc.convert_blank(self.email_entry.get())
+			self.active_profile.mname = misc.convert_blank(self.mname_entry.get())
+			self.active_profile.lname = misc.convert_blank(self.lname_entry.get())
 		self.active_profile.dump()
 
 		super().save()
@@ -841,6 +920,8 @@ class TeacherProfilePage(ProfilePage):
 class SectionProfilePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
+
+		self._edit = True
 
 		#	Tab Manager
 		self.tabmng = ttk.Notebook(master=self)
@@ -949,7 +1030,8 @@ class SectionProfilePage(Page):
 
 		self.btns_frm = tk.Frame(self)
 		self.back_btn = tk.Button(master=self, text='Back', height=2, 
-			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.back)
 		self.edit_toggle_btn = tk.Button(master=self, text='Save', height=2, 
 			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
 
@@ -991,9 +1073,71 @@ class SectionProfilePage(Page):
 		self.open_teacher_btn_tt = Tooltip(self.open_teacher_btn, text='Open a Teacher\'s Profile')
 		self.back_btn_tt = Tooltip(self.back_btn, text='Go Back to Menu')
 
+		self.master.protocol('WM_DELETE_WINDOW', self.exit)
+		self.reload_page()
+
+	@property
+	def edit(self) -> bool:
+		return self._edit
+
+	@edit.setter
+	def edit(self, value: bool) -> None:
+		if value:
+			self.unlock()
+			self._edit = value
+		else:
+			if self.save():
+				self._edit = value
+			else:
+				return
+
+		self.reload_page()
+
 	def reload_page(self, event=None) -> None:
 		pass
 	
+	def back(self, event=None) -> None:
+
+		if self.edit:
+			response = msgbox.askyesnocancel(constants.TITLE, 
+				'Do you want to save the profile?')
+			if response == True:
+				self.edit = False
+			elif response == False:
+				pass
+			elif response is None:
+				return
+
+		self.master.protocol('WM_DELETE_WINDOW', self.master.exit)
+
+		self.master.pagemng.current_page = 'homepage'
+		self.master.pagemng.previous_page = None
+
+	def exit(self, event=None) -> None:
+		if self.edit:
+			response = msgbox.askyesnocancel(constants.TITLE, 
+				'Do you want to save the profile?')
+			if response == True:
+				self.edit = False
+			elif response == False:
+				pass
+			elif response is None:
+				return
+
+		self.master.exit()
+
+	def lock(self) -> None:
+		pass
+
+	def unlock(self) -> None:
+		pass
+
+	def save(self, event=None) -> bool:
+		pass
+
+	def toggle_edit(self, event=None) -> None:
+		pass
+
 class PageManager:
 	def __init__(self) -> None:
 		

@@ -103,11 +103,12 @@ class DataLoader(ABC):
 		return pickle.dumps(self)
 
 class Section(DataLoader):
-	def __init__(self, path: str, name: str, adviser: str) -> None:
+	def __init__(self, path: str, name: str, adviser: str, grade: str) -> None:
 		super().__init__(path)
 
 		self.name: str = name
 		self.adviser: str = adviser
+		self.grade: str = grade
 		self.teachers: List[str] = []
 		self.students: List[str] = []
 
@@ -244,15 +245,16 @@ class Student(Person):
 		fname: str, bday: date, address: str, 
 		sex: Literal['male', 'female'], lrn: str, 
 		sy: Tuple[int, int], parents: List[str], 
-		section: str=None, contact_no: str=None, 
-		email: str=None, mname: str=None, 
-		lname: str=None) -> None:
+		grade_lvl: str, section: str=None, 
+		contact_no: str=None, email: str=None, 
+		mname: str=None, lname: str=None) -> None:
 
 		super().__init__(path, pic, fname, bday, 
 		address, sex, contact_no, email, mname, 
 		lname)
 
 		self.parents: List[str] = parents
+		self.grade_lvl: str = grade_lvl
 		self.lrn: str = lrn
 		self.sy: Tuple[int, int] = sy
 		self.section: str = section
@@ -262,6 +264,7 @@ class Student(Person):
 		d: Student = super().load()
 
 		self.parents = d.parents
+		self.grade_lvl = d.grade_lvl
 		self.lrn = d.lrn
 		self.sy = d.sy
 		self.section = d.section
@@ -273,6 +276,7 @@ class Student(Person):
 		d: Student = super().loads(s)
 
 		self.parents = d.parents
+		self.grade_lvl = d.grade_lvl
 		self.lrn = d.lrn
 		self.sy = d.sy
 		self.section = d.section
@@ -283,7 +287,7 @@ class Teacher(Person):
 	def __init__(self, path: str, pic: str, 
 		fname: str, bday: date, address: str, 
 		sex: Literal['male', 'female'], 
-		section: str=None, contact_no: str=None, 
+		advisory_cls: str=None, sections: List[str]=None, contact_no: str=None, 
 		email: str=None, mname: str=None, lname: str=None
 		) -> None:
 
@@ -291,7 +295,26 @@ class Teacher(Person):
 		address, sex, contact_no, email, mname, 
 		lname)
 		
-		self.section: str = section
+		self.advisory_cls: str = advisory_cls
+		self.sections: List[str] = sections
+
+	def load(self) -> 'Teacher':
+		
+		d: Teacher = super().load()
+
+		self.advisory_cls = d.advisory_cls
+		self.sections = d.sections
+
+		return d
+
+	def loads(self, s: bytes) -> 'Teacher':
+		
+		d: Teacher = super().loads(s)
+
+		self.advisory_cls = d.advisory_cls
+		self.sections = d.sections
+
+		return d
 
 class PathLoader(ABC):
 	def __init__(self, path: str) -> None:
@@ -303,20 +326,24 @@ class PathLoader(ABC):
 
 	@abstractmethod
 	def load(self) -> None:
+		self.items.clear()
 		for path in self.get_all():
 			self.items.append(DataLoader.construct(os.path.join(self.path, path)))
 
 class SectionLoader(PathLoader):
 	def load(self) -> None:
+		self.items.clear()
 		for path in self.get_all():
 			self.items.append(Section.construct(os.path.join(self.path, path)))
 
 class StudentLoader(PathLoader):
 	def load(self) -> None:
+		self.items.clear()
 		for path in self.get_all():
 			self.items.append(Student.construct(os.path.join(self.path, path)))
 
 class TeacherLoader(PathLoader):
 	def load(self) -> None:
+		self.items.clear()
 		for path in self.get_all():
 			self.items.append(Teacher.construct(os.path.join(self.path, path)))
