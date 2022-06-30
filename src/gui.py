@@ -90,17 +90,17 @@ class HomePage(Page):
 		self.inner_r_frm.pack(expand=True, fill='x', padx=(10, 30))
 		self.r_frm.pack(expand=True, fill='both', side='right')
 		
-		self.search_bar_tooltip = Tooltip(self.search_bar, text='Search Bar', 
+		self.search_bar_tt = Tooltip(self.search_bar, text='Search Bar', 
 			font=('Bahnschrift Light', 10))
-		self.new_btn_tooltip = Tooltip(self.new_btn, text='Create a New Profile', 
+		self.new_btn_tt = Tooltip(self.new_btn, text='Create a New Profile', 
 			font=('Bahnschrift Light', 10))
-		self.open_btn_tooltip = Tooltip(self.open_btn, text='Access a Profile', 
+		self.open_btn_tt = Tooltip(self.open_btn, text='Access a Profile', 
 			font=('Bahnschrift Light', 10))
-		self.open_recent_btn_tooltip = Tooltip(self.open_recent_btn, text='Open a recently-accessed profile.', 
+		self.open_recent_btn_tt = Tooltip(self.open_recent_btn, text='Open a recently-accessed profile.', 
 			font=('Bahnschrift Light', 10))
-		self.more_btn_tooltip = Tooltip(self.more_btn, text='More Actions...', 
+		self.more_btn_tt = Tooltip(self.more_btn, text='More Actions...', 
 			font=('Bahnschrift Light', 10))
-		self.exit_btn_tooltip = Tooltip(self.exit_btn, text='Exit SDS', 
+		self.exit_btn_tt = Tooltip(self.exit_btn, text='Exit SDS', 
 			font=('Bahnschrift Light', 10))
 
 		self.dynresize = DynamicResize(self)
@@ -129,12 +129,12 @@ class HomePage(Page):
 		self.more_btn.config(font=('Bahnschrift Light', 14))
 		self.exit_btn.config(font=('Bahnschrift Light', 14))
 
-		self.search_bar_tooltip.font = ('Bahnschrift Light', 10)
-		self.new_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.open_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.open_recent_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.more_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.exit_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.search_bar_tt.font = ('Bahnschrift Light', 10)
+		self.new_btn_tt.font = ('Bahnschrift Light', 10)
+		self.open_btn_tt.font = ('Bahnschrift Light', 10)
+		self.open_recent_btn_tt.font = ('Bahnschrift Light', 10)
+		self.more_btn_tt.font = ('Bahnschrift Light', 10)
+		self.exit_btn_tt.font = ('Bahnschrift Light', 10)
 
 	def new(self, event=None) -> None:
 		self.parent.pagemng.current_page = 'newpage'
@@ -164,13 +164,13 @@ class NewPage(Page):
 		self.back_btn.pack(expand=True, fill='x', padx=10, pady=(10, 0))
 		self.inner_frm.pack(expand=True, fill='x', padx=30)
 
-		self.student_btn_tooltip = Tooltip(self.student_btn, 
+		self.student_btn_tt = Tooltip(self.student_btn, 
 			text='Create a New Student Profile', font=('Bahnschrift Light', 10))
-		self.teacher_btn_tooltip = Tooltip(self.teacher_btn, 
+		self.teacher_btn_tt = Tooltip(self.teacher_btn, 
 			text='Create a New Teacher Profile', font=('Bahnschrift Light', 10))
-		self.section_btn_tooltip = Tooltip(self.section_btn, 
+		self.section_btn_tt = Tooltip(self.section_btn, 
 			text='Create a New Section', font=('Bahnschrift Light', 10))
-		self.back_btn_tooltip = Tooltip(self.back_btn, 
+		self.back_btn_tt = Tooltip(self.back_btn, 
 			text='Go Back to Previous Page', font=('Bahnschrift Light', 10))
 
 		self.dynresize = DynamicResize(self)
@@ -190,11 +190,11 @@ class NewPage(Page):
 		self.section_btn.config(font=('Bahnschrift Light', 16))
 		self.back_btn.config(font=('Bahnschrift Light', 16))
 
-		self.student_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.student_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.teacher_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.section_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.back_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.student_btn_tt.font = ('Bahnschrift Light', 10)
+		self.student_btn_tt.font = ('Bahnschrift Light', 10)
+		self.teacher_btn_tt.font = ('Bahnschrift Light', 10)
+		self.section_btn_tt.font = ('Bahnschrift Light', 10)
+		self.back_btn_tt.font = ('Bahnschrift Light', 10)
 
 	def back(self) -> None:
 
@@ -354,17 +354,17 @@ class ProfilePage(Page):
 		self.dynresize.add_child(self.edit_toggle_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 14, 16, 6)
 
-		self.pic_btn_tooltip = Tooltip(self.pic_btn, text='Click to Select Picture')
-		self.lname_entry_tooltip = Tooltip(self.lname_entry, text='Last Name')
-		self.fname_entry_tooltip = Tooltip(self.fname_entry, text='First Name')
-		self.mname_entry_tooltip = Tooltip(self.mname_entry, text='Full Middle Name, Optional')
-		self.address_entry_tooltip = Tooltip(self.address_entry, text='Address')
-		self.bday_entry_tooltip = Tooltip(self.bday_entry, text='Birthday in MM/DD/YYYY format')
-		self.contact_entry_tooltip = Tooltip(self.contact_entry, text='Contact Number, Optional')
-		self.email_entry_tooltip = Tooltip(self.email_entry, text='Email Address, Optional')
-		self.gender_cbox_tooltip = Tooltip(self.gender_cbox, text='Gender')
-		self.edit_toggle_btn_tooltip = Tooltip(self.edit_toggle_btn, text='Save the Profile')
-		self.back_btn_tooltip = Tooltip(self.back_btn, text='Go Back to Menu')
+		self.pic_btn_tt = Tooltip(self.pic_btn, text='Click to Select Picture')
+		self.lname_entry_tt = Tooltip(self.lname_entry, text='Last Name')
+		self.fname_entry_tt = Tooltip(self.fname_entry, text='First Name')
+		self.mname_entry_tt = Tooltip(self.mname_entry, text='Full Middle Name, Optional')
+		self.address_entry_tt = Tooltip(self.address_entry, text='Address')
+		self.bday_entry_tt = Tooltip(self.bday_entry, text='Birthday in MM/DD/YYYY format')
+		self.contact_entry_tt = Tooltip(self.contact_entry, text='Contact Number, Optional')
+		self.email_entry_tt = Tooltip(self.email_entry, text='Email Address, Optional')
+		self.gender_cbox_tt = Tooltip(self.gender_cbox, text='Gender')
+		self.edit_toggle_btn_tt = Tooltip(self.edit_toggle_btn, text='Save the Profile')
+		self.back_btn_tt = Tooltip(self.back_btn, text='Go Back to Menu')
 
 		#	Note: Call self.reload_page() on subclasses
 		self.master.protocol('WM_DELETE_WINDOW', self.exit)
@@ -493,17 +493,17 @@ class ProfilePage(Page):
 		self.edit_toggle_btn.config(font=('Bahnschrift Light', 14))
 		self.back_btn.config(font=('Bahnschrift Light', 14))
 
-		self.pic_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.lname_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.fname_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.mname_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.address_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.bday_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.contact_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.email_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.gender_cbox_tooltip.font = ('Bahnschrift Light', 10)
-		self.edit_toggle_btn_tooltip.font = ('Bahnschrift Light', 10)
-		self.back_btn_tooltip.font = ('Bahnschrift Light', 10)
+		self.pic_btn_tt.font = ('Bahnschrift Light', 10)
+		self.lname_entry_tt.font = ('Bahnschrift Light', 10)
+		self.fname_entry_tt.font = ('Bahnschrift Light', 10)
+		self.mname_entry_tt.font = ('Bahnschrift Light', 10)
+		self.address_entry_tt.font = ('Bahnschrift Light', 10)
+		self.bday_entry_tt.font = ('Bahnschrift Light', 10)
+		self.contact_entry_tt.font = ('Bahnschrift Light', 10)
+		self.email_entry_tt.font = ('Bahnschrift Light', 10)
+		self.gender_cbox_tt.font = ('Bahnschrift Light', 10)
+		self.edit_toggle_btn_tt.font = ('Bahnschrift Light', 10)
+		self.back_btn_tt.font = ('Bahnschrift Light', 10)
 
 		if self.edit:
 			self.edit_toggle_btn.config(text='Save')
@@ -606,10 +606,10 @@ class StudentProfilePage(ProfilePage):
 		self.dynresize.add_child(self.sy2_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.sy_to_entry, 'Bahnschrift Light', 14, 16, 6)
 
-		self.parent_entry_tooltip = Tooltip(self.parents_entry, text='Parents, Separate w/ Comma, Optional')
-		self.lrn_entry_tooltip = Tooltip(self.lrn_entry, text='Learner\'s Reference Number')
-		self.grade_cbox_tooltip = Tooltip(self.grade_cbox, text='Grade Level')
-		self.section_entry_tooltip = Tooltip(self.section_entry, text='Section / Class Name, Optional')
+		self.parent_entry_tt = Tooltip(self.parents_entry, text='Parents, Separate w/ Comma, Optional')
+		self.lrn_entry_tt = Tooltip(self.lrn_entry, text='Learner\'s Reference Number')
+		self.grade_cbox_tt = Tooltip(self.grade_cbox, text='Grade Level')
+		self.section_entry_tt = Tooltip(self.section_entry, text='Section / Class Name, Optional')
 
 		self.reload_page()
 	
@@ -702,10 +702,10 @@ class StudentProfilePage(ProfilePage):
 		self.sy2_lbl.config(font=('Bahnschrift Light', 14))
 		self.sy_to_entry.config(font=('Bahnschrift Light', 14))
 		
-		self.parent_entry_tooltip.font = ('Bahnschrift Light', 10) 
-		self.lrn_entry_tooltip.font = ('Bahnschrift Light', 10)
-		self.grade_cbox_tooltip.font = ('Bahnschrift Light', 10)
-		self.section_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.parent_entry_tt.font = ('Bahnschrift Light', 10) 
+		self.lrn_entry_tt.font = ('Bahnschrift Light', 10)
+		self.grade_cbox_tt.font = ('Bahnschrift Light', 10)
+		self.section_entry_tt.font = ('Bahnschrift Light', 10)
 
 class TeacherProfilePage(ProfilePage):
 	def __init__(self, master: tk.Widget) -> None:
@@ -732,7 +732,7 @@ class TeacherProfilePage(ProfilePage):
 
 		self.dynresize.add_child(self.advisorycls_entry, 'Bahnschrift Light', 14, 16, 6)
 
-		self.advisorycls_entry_tooltip = Tooltip(self.advisorycls_entry, text='Advisory Class, Optional')
+		self.advisorycls_entry_tt = Tooltip(self.advisorycls_entry, text='Advisory Class, Optional')
 
 		self.reload_page()
 
@@ -795,7 +795,7 @@ class TeacherProfilePage(ProfilePage):
 
 		self.advisorycls_entry.config(font=('Bahnschrift Light', 14))
 
-		self.advisorycls_entry_tooltip.font = ('Bahnschrift Light', 10)
+		self.advisorycls_entry_tt.font = ('Bahnschrift Light', 10)
 
 class SectionProfilePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
@@ -917,9 +917,38 @@ class SectionProfilePage(Page):
 		self.btns_frm.pack(fill='x')
 
 		self.dynresize = DynamicResize(self.master)
+		self.dynresize.add_child(self.name_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.name_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.grade_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.grade_cbox, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.adviser_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.adviser_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.teachers_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.teachers_list, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.add_teacher_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.remove_teacher_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.open_teacher_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.student_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.student_list, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.add_student_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.remove_student_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.open_student_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.edit_toggle_btn, 'Bahnschrift Light', 14, 16, 6)
 
-		self.edit_toggle_btn_tooltip = Tooltip(self.edit_toggle_btn, text='Save the Profile')
-		self.back_btn_tooltip = Tooltip(self.back_btn, text='Go Back to Menu')
+		self.name_entry_tt = Tooltip(self.name_entry, text='Name of the Section')
+		self.grade_cbox_tt = Tooltip(self.grade_cbox, text='Grade Level of the Section')
+		self.adviser_entry_tt = Tooltip(self.adviser_entry, text='Adviser of the Section')
+		self.edit_toggle_btn_tt = Tooltip(self.edit_toggle_btn, text='Save the Profile')
+		self.teachers_list_tt = Tooltip(self.teachers_list, text='List of Teachers in this Section')
+		self.add_teacher_btn_tt = Tooltip(self.add_teacher_btn, text='Add a Teacher to the Section')
+		self.remove_teacher_btn_tt = Tooltip(self.remove_teacher_btn, text='Remove a Teacher from the Section')
+		self.open_teacher_btn_tt = Tooltip(self.open_teacher_btn, text='Open a Teacher\'s Profile')
+		self.student_list_tt = Tooltip(self.student_list, text='List of Teachers in this Section')
+		self.add_teacher_btn_tt = Tooltip(self.add_teacher_btn, text='Add a Teacher to the Section')
+		self.remove_teacher_btn_tt = Tooltip(self.remove_teacher_btn, text='Remove a Teacher from the Section')
+		self.open_teacher_btn_tt = Tooltip(self.open_teacher_btn, text='Open a Teacher\'s Profile')
+		self.back_btn_tt = Tooltip(self.back_btn, text='Go Back to Menu')
 
 	def reload_page(self, event=None) -> None:
 		pass
@@ -988,7 +1017,7 @@ class PageManager:
 			raise KeyError(f'Page \"{name}\" not found.')
 
 #   From Erik Bethke from
-#   https://stackoverflow.com/questions/3221966/how-do-i-display-tooltips-in-tkinter
+#   https://stackoverflow.com/questions/3221966/how-do-i-display-tts-in-tkinter
 #   Though I have added some modifications
 #   TODO: 
 #   - Add fade in and out
@@ -1093,7 +1122,7 @@ class Tooltip:
 
 			# TIP:
 			# A further mod might automagically augment the
-			# wraplength when the tooltip is too high to be
+			# wraplength when the tt is too high to be
 			# kept inside the screen.
 			y1 = 0
 

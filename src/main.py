@@ -8,7 +8,7 @@ import data
 import gui
 import misc
 
-#   Code
+#   Code 
 class App(tk.Tk):
 	def __init__(self) -> None:
 
