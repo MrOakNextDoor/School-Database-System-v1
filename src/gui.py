@@ -8,7 +8,7 @@ from PIL import ImageTk, Image
 from tkcalendar import DateEntry
 from tkinter import filedialog, ttk
 from tkinter import messagebox as msgbox
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, List
 
 import constants
 import data
@@ -654,7 +654,7 @@ class StudentProfilePage(ProfilePage):
 		self.grade_cbox_tt = Tooltip(self.grade_cbox, text='Grade Level')
 		self.section_entry_tt = Tooltip(self.section_entry, text='Section / Class Name, Optional')
 		
-		self.section_entry.bind('<Button-1>', self.section_link)
+		self.section_entry.bind('<ButtonRelease-1>', self.section_link)
 
 		self.reload_page()
 	
@@ -793,14 +793,16 @@ class StudentProfilePage(ProfilePage):
 			if os.path.exists(self.section_path):
 				self.master.protocol('WM_DELETE_WINDOW', self.master.exit)
 
-				self.master.pagemng.current_page = 'homepage'
+				# self.master.pagemng.pages['pfppage'] = SectionProfilePage.construct
 				self.master.pagemng.previous_page = None
 
 class TeacherProfilePage(ProfilePage):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
 
+		self.active_profile = None
 		self.teacher_frm = tk.Frame(self)
+		self.sections = []
 
 		#	Advisory Section Input:
 		self.advisorycls_input_frm = tk.Frame(self.teacher_frm)
@@ -836,7 +838,8 @@ class TeacherProfilePage(ProfilePage):
 
 		self.section_btns_frm = tk.Frame(self.section_frm)
 		self.add_section_btn = tk.Button(master=self.section_btns_frm, text='Add', height=2, 
-			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.add_section)
 		self.remove_section_btn = tk.Button(master=self.section_btns_frm, text='Remove', height=2, 
 			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
 		self.open_section_btn = tk.Button(master=self.section_btns_frm, text='Open', height=2, 
@@ -867,6 +870,15 @@ class TeacherProfilePage(ProfilePage):
 		self.dynresize.add_child(self.remove_section_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.open_section_btn, 'Bahnschrift Light', 14, 16, 6)
 
+		self.advisorycls_input_entry_tt = Tooltip(self.advisorycls_input_entry, text='Advisory Class, Optional')
+		self.section_input_entry_tt = Tooltip(self.section_input_entry, text='Add a Section')
+		self.section_list_tt = Tooltip(self.section_list, text='All the Sections the Teacher Holds')
+		self.add_section_btn_tt = Tooltip(self.add_section_btn, text='Add a Section')
+		self.remove_section_btn_tt = Tooltip(self.remove_section_btn, text='Remove the Selected Section')
+		self.open_section_btn_tt = Tooltip(self.open_section_btn, text='Open the Selected Section')
+
+		self.advisorycls_input_entry.bind('<ButtonRelease-1>', self.section_link)
+
 	def lock(self, event=None) -> None:
 
 		super().lock(event)
@@ -878,6 +890,126 @@ class TeacherProfilePage(ProfilePage):
 	def reload_page(self, event=None) -> None:
 
 		super().reload_page(event)
+
+		self.advisorycls_input_lbl.config(font=('Bahnschrift Light', 14))
+		self.advisorycls_input_entry.config(font=('Bahnschrift Light', 14))
+		self.section_input_lbl.config(font=('Bahnschrift Light', 14))
+		self.section_input_entry.config(font=('Bahnschrift Light', 14))
+		self.section_list.config(font=('Bahnschrift Light', 14))
+		self.add_section_btn.config(font=('Bahnschrift Light', 14))
+		self.remove_section_btn.config(font=('Bahnschrift Light', 14))
+		self.open_section_btn.config(font=('Bahnschrift Light', 14))
+
+		self.advisorycls_input_entry_tt.font = ('Bahnschrift Light', 14)
+		self.section_input_entry_tt.font = ('Bahnschrift Light', 14)
+		self.section_list_tt.font = ('Bahnschrift Light', 14)
+		self.add_section_btn_tt.font = ('Bahnschrift Light', 14)
+		self.remove_section_btn_tt.font = ('Bahnschrift Light', 14)
+		self.open_section_btn_tt.font = ('Bahnschrift Light', 14)
+
+		self.upd_section_list()
+
+	def save(self, event=None) -> None:
+		
+		required = {
+			'Picture': misc.convert_blank(self.img_path),
+			'First Name': misc.convert_blank(self.fname_entry.get()),
+			'Address': misc.convert_blank(self.address_entry.get()),
+			'Gender': misc.convert_blank(self.gender_cbox.get()),
+		}
+
+		for key, info in required.items():
+			if info is None:
+				msgbox.showerror(constants.TITLE, f'{key} required.')
+				return False
+
+		section = misc.convert_blank(self.advisorycls_input_entry.get())
+		self.section_path = None
+		if section is not None:
+			sections = {section.name: section.path for section in \
+				self.master.sectionloader.items}
+			try:
+				self.section_path: str = sections[section]
+			except KeyError:
+				msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
+				return
+
+		if self.active_profile is None:
+			self.active_profile = data.Teacher(
+				os.path.join(constants.PATHS.STUDENTS.value,
+					constants.FILENAME_FORMATS.STUDENT.value.format(
+						lname=self.lname_entry.get().replace(' ', ''),
+						fname=required['First Name'].replace(' ', ''),
+						mname=self.mname_entry.get().replace(' ', ''))), 
+				required['Picture'], 
+				required['First Name'],
+				self.bday_entry.get_date(),
+				required['Address'],
+				required['Gender'],
+				self.section_path,
+				self.sections,
+				misc.convert_blank(self.contact_entry.get()),
+				misc.convert_blank(self.email_entry.get()),
+				misc.convert_blank(self.mname_entry.get()),
+				misc.convert_blank(self.lname_entry.get()))
+		else:
+			self.active_profile.path = os.path.join(constants.PATHS.STUDENTS.value,
+					constants.FILENAME_FORMATS.STUDENT.value.format(
+						lname=self.lname_entry.get().replace(' ', ''),
+						fname=required['First Name'].replace(' ', ''),
+						mname=self.mname_entry.get().replace(' ', '')))
+			self.active_profile.pic = required['Picture']
+			self.active_profile.fname = required['First Name']
+			self.active_profile.bday = self.bday_entry.get_date()
+			self.active_profile.address = required['Address']
+			self.active_profile.sex = required['Gender']
+			self.active_profile.advisory_cls = self.section_path
+			self.active_profile.sections = self.sections
+			self.active_profile.contact_no = misc.convert_blank(self.contact_entry.get())
+			self.active_profile.email = misc.convert_blank(self.email_entry.get())
+			self.active_profile.mname = misc.convert_blank(self.mname_entry.get())
+			self.active_profile.lname = misc.convert_blank(self.lname_entry.get())
+			
+		self.active_profile.dump()
+
+		super().save()
+
+		return True
+
+	def add_section(self, event=None) -> None:
+
+		target = misc.convert_blank(self.section_input_entry.get())
+		self.section_path = None
+		if target is not None:
+			sections = {section.name: section.path for section in \
+				self.master.sectionloader.items}
+			try:
+				section_path = sections[target]
+				self.sections.append([target, section_path])
+				self.upd_section_list(self, event)
+			except KeyError:
+				msgbox.showerror(constants.TITLE, f'The section \'{target}\' does not exist.')
+				return
+
+	def upd_section_list(self, event=None) -> None:
+		
+		self.master.reload_page()
+
+		for item in self.sections:
+			if not os.path.exists(item[1]):
+				self.sections.remove(item)
+
+		self.section_list.insert('end', *[item[0] for item in self.sections])
+
+	def section_link(self, event=None) -> None:
+		
+		if not self.edit and self.section_path is not None:
+			if os.path.exists(self.section_path):
+				self.master.protocol('WM_DELETE_WINDOW', self.master.exit)
+
+				self.master.pagemng.pages['pfppage'] = \
+					SectionProfilePage.load(data.Section.construct(self.section_path))
+				self.master.pagemng.previous_page = None
 
 class SectionProfilePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
