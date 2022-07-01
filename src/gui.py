@@ -688,7 +688,27 @@ class StudentProfilePage(ProfilePage):
 				msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
 				return
 
-		if self.active_profile is None:
+		try:
+			self.active_profile.path = os.path.join(constants.PATHS.STUDENTS.value,
+					constants.FILENAME_FORMATS.STUDENT.value.format(
+						lname=self.lname_entry.get().replace(' ', ''),
+						fname=required['First Name'].replace(' ', ''),
+						mname=self.mname_entry.get().replace(' ', '')))
+			self.active_profile.pic = required['Picture']
+			self.active_profile.fname = required['First Name']
+			self.active_profile.bday = self.bday_entry.get_date()
+			self.active_profile.address = required['Address']
+			self.active_profile.sex = required['Gender']
+			self.active_profile.lrn = required['Learner\'s Reference Number']
+			self.active_profile.sy = (required['School Year (From)'], 
+				required['School Year (To)'])
+			self.active_profile.grade_lvl = required['Grade Level']
+			self.active_profile.section = self.section_path
+			self.active_profile.contact_no = misc.convert_blank(self.contact_entry.get())
+			self.active_profile.email = misc.convert_blank(self.email_entry.get())
+			self.active_profile.mname = misc.convert_blank(self.mname_entry.get())
+			self.active_profile.lname = misc.convert_blank(self.lname_entry.get())
+		except (AttributeError, OSError):
 			self.active_profile = data.Student(
 				os.path.join(constants.PATHS.STUDENTS.value,
 					constants.FILENAME_FORMATS.STUDENT.value.format(
@@ -709,26 +729,6 @@ class StudentProfilePage(ProfilePage):
 				misc.convert_blank(self.email_entry.get()),
 				misc.convert_blank(self.mname_entry.get()),
 				misc.convert_blank(self.lname_entry.get()))
-		else:
-			self.active_profile.path = os.path.join(constants.PATHS.STUDENTS.value,
-					constants.FILENAME_FORMATS.STUDENT.value.format(
-						lname=self.lname_entry.get().replace(' ', ''),
-						fname=required['First Name'].replace(' ', ''),
-						mname=self.mname_entry.get().replace(' ', '')))
-			self.active_profile.pic = required['Picture']
-			self.active_profile.fname = required['First Name']
-			self.active_profile.bday = self.bday_entry.get_date()
-			self.active_profile.address = required['Address']
-			self.active_profile.sex = required['Gender']
-			self.active_profile.lrn = required['Learner\'s Reference Number']
-			self.active_profile.sy = (required['School Year (From)'], 
-				required['School Year (To)'])
-			self.active_profile.grade_lvl = required['Grade Level']
-			self.active_profile.section = self.section_path
-			self.active_profile.contact_no = misc.convert_blank(self.contact_entry.get())
-			self.active_profile.email = misc.convert_blank(self.email_entry.get())
-			self.active_profile.mname = misc.convert_blank(self.mname_entry.get())
-			self.active_profile.lname = misc.convert_blank(self.lname_entry.get())
 			
 		self.active_profile.dump()
 
@@ -883,9 +883,18 @@ class TeacherProfilePage(ProfilePage):
 
 		super().lock(event)
 
+		self.advisorycls_input_entry.config(state='disabled')
+		self.section_input_entry.config(state='disabled')
+		self.add_section_btn.config(state='disabled')
+		self.remove_section_btn.config(state='disabled')
+
 	def unlock(self, event=None) -> None:
 		
 		super().unlock(event)
+		self.advisorycls_input_entry.config(state='disabled')
+		self.section_input_entry.config(state='disabled')
+		self.add_section_btn.config(state='disabled')
+		self.remove_section_btn.config(state='disabled')
 
 	def reload_page(self, event=None) -> None:
 
@@ -900,12 +909,12 @@ class TeacherProfilePage(ProfilePage):
 		self.remove_section_btn.config(font=('Bahnschrift Light', 14))
 		self.open_section_btn.config(font=('Bahnschrift Light', 14))
 
-		self.advisorycls_input_entry_tt.font = ('Bahnschrift Light', 14)
-		self.section_input_entry_tt.font = ('Bahnschrift Light', 14)
-		self.section_list_tt.font = ('Bahnschrift Light', 14)
-		self.add_section_btn_tt.font = ('Bahnschrift Light', 14)
-		self.remove_section_btn_tt.font = ('Bahnschrift Light', 14)
-		self.open_section_btn_tt.font = ('Bahnschrift Light', 14)
+		self.advisorycls_input_entry_tt.font = ('Bahnschrift Light', 10)
+		self.section_input_entry_tt.font = ('Bahnschrift Light', 10)
+		self.section_list_tt.font = ('Bahnschrift Light', 10)
+		self.add_section_btn_tt.font = ('Bahnschrift Light', 10)
+		self.remove_section_btn_tt.font = ('Bahnschrift Light', 10)
+		self.open_section_btn_tt.font = ('Bahnschrift Light', 10)
 
 		self.upd_section_list()
 
@@ -934,25 +943,7 @@ class TeacherProfilePage(ProfilePage):
 				msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
 				return
 
-		if self.active_profile is None:
-			self.active_profile = data.Teacher(
-				os.path.join(constants.PATHS.STUDENTS.value,
-					constants.FILENAME_FORMATS.STUDENT.value.format(
-						lname=self.lname_entry.get().replace(' ', ''),
-						fname=required['First Name'].replace(' ', ''),
-						mname=self.mname_entry.get().replace(' ', ''))), 
-				required['Picture'], 
-				required['First Name'],
-				self.bday_entry.get_date(),
-				required['Address'],
-				required['Gender'],
-				self.section_path,
-				self.sections,
-				misc.convert_blank(self.contact_entry.get()),
-				misc.convert_blank(self.email_entry.get()),
-				misc.convert_blank(self.mname_entry.get()),
-				misc.convert_blank(self.lname_entry.get()))
-		else:
+		try:
 			self.active_profile.path = os.path.join(constants.PATHS.STUDENTS.value,
 					constants.FILENAME_FORMATS.STUDENT.value.format(
 						lname=self.lname_entry.get().replace(' ', ''),
@@ -969,6 +960,24 @@ class TeacherProfilePage(ProfilePage):
 			self.active_profile.email = misc.convert_blank(self.email_entry.get())
 			self.active_profile.mname = misc.convert_blank(self.mname_entry.get())
 			self.active_profile.lname = misc.convert_blank(self.lname_entry.get())
+		except (AttributeError, OSError):
+			self.active_profile = data.Teacher(
+				os.path.join(constants.PATHS.TEACHERS.value,
+					constants.FILENAME_FORMATS.TEACHER.value.format(
+						lname=self.lname_entry.get().replace(' ', ''),
+						fname=required['First Name'].replace(' ', ''),
+						mname=self.mname_entry.get().replace(' ', ''))), 
+				required['Picture'], 
+				required['First Name'],
+				self.bday_entry.get_date(),
+				required['Address'],
+				required['Gender'],
+				self.section_path,
+				self.sections,
+				misc.convert_blank(self.contact_entry.get()),
+				misc.convert_blank(self.email_entry.get()),
+				misc.convert_blank(self.mname_entry.get()),
+				misc.convert_blank(self.lname_entry.get()))
 			
 		self.active_profile.dump()
 
@@ -992,8 +1001,6 @@ class TeacherProfilePage(ProfilePage):
 				return
 
 	def upd_section_list(self, event=None) -> None:
-		
-		self.master.reload_page()
 
 		for item in self.sections:
 			if not os.path.exists(item[1]):
@@ -1089,18 +1096,18 @@ class SectionProfilePage(Page):
 		self.teachers_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Student List
-		self.student_lbl = tk.Label(master=self.general_frm, text='Students', anchor='w')
-		self.student_lbl.pack(fill='x', padx=10, pady=2)
+		self.students_lbl = tk.Label(master=self.general_frm, text='Students', anchor='w')
+		self.students_lbl.pack(fill='x', padx=10, pady=2)
 		self.student_frm = tk.Frame(self.general_frm)
 		self.inner_student_frm = tk.Frame(self.student_frm)
 		self.student_list_scrollbar = tk.Scrollbar(master=self.inner_student_frm)
-		self.student_list = tk.Listbox(master=self.inner_student_frm, yscrollcommand=self.student_list_scrollbar.set, 
+		self.students_list = tk.Listbox(master=self.inner_student_frm, yscrollcommand=self.student_list_scrollbar.set, 
 			relief='groove', bd=2)
-		self.student_list_scrollbar.config(command=self.student_list.yview)
+		self.student_list_scrollbar.config(command=self.students_list.yview)
 		for i in range(1, 101):
-			self.student_list.insert(tk.END, f'Keon Clone {i} as Student Keon {i}')
+			self.students_list.insert(tk.END, f'Keon Clone {i} as Student Keon {i}')
 		self.student_list_scrollbar.pack(fill='y', side='right')
-		self.student_list.pack(expand=True, fill='both', side='left')
+		self.students_list.pack(expand=True, fill='both', side='left')
 		self.student_btns_frm = tk.Frame(self.student_frm)
 		self.add_student_btn = tk.Button(master=self.student_btns_frm, text='Add', height=2, 
 			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
@@ -1127,8 +1134,8 @@ class SectionProfilePage(Page):
 			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
 			command=self.back)
 		self.edit_toggle_btn = tk.Button(master=self, text='Save', height=2, 
-			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
-
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.toggle_edit)
 		self.back_btn.pack(expand=True, fill='x', padx=(10, 5), pady=10, side='left')
 		self.edit_toggle_btn.pack(expand=True, fill='x', padx=(5, 10), pady=10, side='right')
 		self.btns_frm.pack(fill='x')
@@ -1145,8 +1152,8 @@ class SectionProfilePage(Page):
 		self.dynresize.add_child(self.add_teacher_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.remove_teacher_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.open_teacher_btn, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.student_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.student_list, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.students_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.students_list, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.add_student_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.remove_student_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.open_student_btn, 'Bahnschrift Light', 14, 16, 6)
@@ -1161,7 +1168,7 @@ class SectionProfilePage(Page):
 		self.add_teacher_btn_tt = Tooltip(self.add_teacher_btn, text='Add a Teacher to the Section')
 		self.remove_teacher_btn_tt = Tooltip(self.remove_teacher_btn, text='Remove a Teacher from the Section')
 		self.open_teacher_btn_tt = Tooltip(self.open_teacher_btn, text='Open a Teacher\'s Profile')
-		self.student_list_tt = Tooltip(self.student_list, text='List of Teachers in this Section')
+		self.student_list_tt = Tooltip(self.students_list, text='List of Teachers in this Section')
 		self.add_teacher_btn_tt = Tooltip(self.add_teacher_btn, text='Add a Teacher to the Section')
 		self.remove_teacher_btn_tt = Tooltip(self.remove_teacher_btn, text='Remove a Teacher from the Section')
 		self.open_teacher_btn_tt = Tooltip(self.open_teacher_btn, text='Open a Teacher\'s Profile')
@@ -1181,6 +1188,7 @@ class SectionProfilePage(Page):
 			self._edit = value
 		else:
 			if self.save():
+				self.lock()
 				self._edit = value
 			else:
 				return
@@ -1188,7 +1196,39 @@ class SectionProfilePage(Page):
 		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
-		pass
+
+		self.name_lbl.config(font=('Bahnschrift Light', 14))
+		self.name_entry.config(font=('Bahnschrift Light', 14))
+		self.grade_lbl.config(font=('Bahnschrift Light', 14))
+		self.grade_cbox.config(font=('Bahnschrift Light', 14))
+		self.adviser_lbl.config(font=('Bahnschrift Light', 14))
+		self.adviser_entry.config(font=('Bahnschrift Light', 14))
+		self.teachers_lbl.config(font=('Bahnschrift Light', 14))
+		self.teachers_list.config(font=('Bahnschrift Light', 14))
+		self.add_teacher_btn.config(font=('Bahnschrift Light', 14))
+		self.remove_teacher_btn.config(font=('Bahnschrift Light', 14))
+		self.open_teacher_btn.config(font=('Bahnschrift Light', 14))
+		self.students_lbl.config(font=('Bahnschrift Light', 14))
+		self.students_list.config(font=('Bahnschrift Light', 14))
+		self.add_student_btn.config(font=('Bahnschrift Light', 14))
+		self.remove_student_btn.config(font=('Bahnschrift Light', 14))
+		self.open_student_btn.config(font=('Bahnschrift Light', 14))
+		self.back_btn.config(font=('Bahnschrift Light', 14))
+		self.edit_toggle_btn.config(font=('Bahnschrift Light', 14))
+
+		self.name_entry_tt.font = ('Bahnschrift Light', 10)
+		self.grade_cbox_tt.font = ('Bahnschrift Light', 10)
+		self.adviser_entry_tt.font = ('Bahnschrift Light', 10)
+		self.edit_toggle_btn_tt.font = ('Bahnschrift Light', 10)
+		self.teachers_list_tt.font = ('Bahnschrift Light', 10)
+		self.add_teacher_btn_tt.font = ('Bahnschrift Light', 10)
+		self.remove_teacher_btn_tt.font = ('Bahnschrift Light', 10)
+		self.open_teacher_btn_tt.font = ('Bahnschrift Light', 10)
+		self.student_list_tt.font = ('Bahnschrift Light', 10)
+		self.add_teacher_btn_tt.font = ('Bahnschrift Light', 10)
+		self.remove_teacher_btn_tt.font = ('Bahnschrift Light', 10)
+		self.open_teacher_btn_tt.font = ('Bahnschrift Light', 10)
+		self.back_btn_tt.font = ('Bahnschrift Light', 10)
 	
 	def back(self, event=None) -> None:
 
@@ -1221,16 +1261,30 @@ class SectionProfilePage(Page):
 		self.master.exit()
 
 	def lock(self) -> None:
-		pass
+		
+		self.name_entry.config(state='disabled')
+		self.grade_cbox.config(state='disabled')
+		self.adviser_entry.config(state='disabled')
+		self.add_teacher_btn.config(state='disabled')
+		self.remove_teacher_btn.config(state='disabled')
+		self.add_student_btn.config(state='disabled')
+		self.remove_student_btn.config(state='disabled')
 
 	def unlock(self) -> None:
-		pass
+
+		self.name_entry.config(state='normal')
+		self.grade_cbox.config(state='normal')
+		self.adviser_entry.config(state='normal')
+		self.add_teacher_btn.config(state='normal')
+		self.remove_teacher_btn.config(state='normal')
+		self.add_student_btn.config(state='normal')
+		self.remove_student_btn.config(state='normal')
 
 	def save(self, event=None) -> bool:
-		pass
+		return True
 
 	def toggle_edit(self, event=None) -> None:
-		pass
+		self.edit = not self.edit
 
 class PageManager:
 	def __init__(self) -> None:
