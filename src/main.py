@@ -40,13 +40,17 @@ class App(tk.Tk):
 
 	def reload_window(self, event=None) -> None:
 
-		self.sectionloader.load()
-		self.studentloader.load()
-		self.teacherloader.load()
+		self.reload_loaders(event)
 
 		self.title(constants.TITLE)
 
 		self.pagemng.pages[self.pagemng.current_page].reload_page()
+
+	def reload_loaders(self, event=None) -> None:
+		
+		self.sectionloader.load()
+		self.studentloader.load()
+		self.teacherloader.load()
 
 	def exit(self) -> None:
 

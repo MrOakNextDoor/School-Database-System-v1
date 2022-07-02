@@ -210,6 +210,14 @@ class Person(DataLoader):
 		except AttributeError:
 			return
 
+	def get_full_name(self, fmt: str='{f} {m} {l}') -> str:
+		"""Return the full name of the Person with a format.
+
+		Args:
+			fmt (str): The format to be used.
+		"""
+		return fmt.format(f=self.fname, m=self.mname, l=self.lname)
+
 	def load(self) -> Type['Person']:
 		
 		d: Person = super().load()

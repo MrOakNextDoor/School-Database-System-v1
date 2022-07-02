@@ -224,37 +224,6 @@ class NewPage(Page):
 		self.master.pagemng.pages['pfppage'] = SectionProfilePage(self.master)
 		self.master.pagemng.current_page = 'pfppage'
 
-class OpenPage(Page):
-	def __init__(self, master: tk.Widget) -> None:
-		super().__init__(master=master)
-
-		self.inner_frm = tk.Frame(master=self)
-		self.title = tk.Label(master=self.inner_frm, text='Open a Profile')
-		self.back_btn = tk.Button(master=self.inner_frm, text='Back', 
-
-			height=3, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
-			command=self.back)
-
-		self.title.pack(expand=True, fill='x', side='top', pady=10)
-		self.back_btn.pack(expand=True, fill='x', padx=10, pady=(10, 0))
-
-		self.dynresize = DynamicResize(self)
-		self.dynresize.add_child(self.title, 'Bahnschrift', 36, 40, 10)
-		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 16, 20, 6)
-
-		self.back_btn_tt = Tooltip(self.back_btn, 
-			text='Go Back to Previous Page', font=('Bahnschrift Light', 10))
-		self.inner_frm.pack(expand=True, fill='x', padx=30)
-
-		self.reload_page()
-
-	def reload_page(self, event=None) -> None:
-		pass
-
-	def back(self) -> None:
-
-		self.master.pagemng.back()
-
 class ProfilePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
 		super().__init__(master=master)
@@ -594,11 +563,13 @@ class StudentProfilePage(ProfilePage):
 
 		#	Section
 		self.section_frm = tk.Frame(master=self.student_frm)
-		self.section_lbl = tk.Label(master=self.section_frm, text='Section, Optional')
-		self.section_entry = tk.Entry(master=self.section_frm, relief='groove', bd=2)
+		self.section_lbl = tk.Label(master=self.section_frm, text='Section')
+		self.section_btn = tk.Button(master=self.section_frm, text='None', height=1, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.section)
 
 		self.section_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.section_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.section_btn.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 
 		self.section_frm.columnconfigure(1, weight=1)
 
@@ -638,7 +609,7 @@ class StudentProfilePage(ProfilePage):
 		self.dynresize.add_child(self.grade_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.grade_cbox, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.section_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.section_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.section_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.sy1_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.sy_from_entry, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.sy2_lbl, 'Bahnschrift Light', 14, 16, 6)
@@ -647,20 +618,18 @@ class StudentProfilePage(ProfilePage):
 		self.parent_entry_tt = Tooltip(self.parents_entry, text='Parents, Separate w/ Comma, Optional')
 		self.lrn_entry_tt = Tooltip(self.lrn_entry, text='Learner\'s Reference Number')
 		self.grade_cbox_tt = Tooltip(self.grade_cbox, text='Grade Level')
-		self.section_entry_tt = Tooltip(self.section_entry, text='Section / Class Name, Optional')
-		
-		self.section_entry.bind('<ButtonRelease-1>', self.section_link)
+		self.section_entry_tt = Tooltip(self.section_btn, text='Section / Class Name, Optional')
 
 		self.reload_page()
 	
-	def save(self) -> bool:
+	def save(self, event=None) -> bool:
 
 		required = {
 			'Picture': misc.convert_blank(self.img_path),
 			'First Name': misc.convert_blank(self.fname_entry.get()),
 			'Address': misc.convert_blank(self.address_entry.get()),
 			'Gender': misc.convert_blank(self.gender_cbox.get()),
-			'Parents': misc.convert_blank(self.parents_entry.get()),
+			'Parents': self.parents_entry.get(),
 			'Learner\'s Reference Number': misc.convert_blank(self.lrn_entry.get()),
 			'School Year (From)': misc.convert_blank(self.sy_from_entry.get()),
 			'School Year (To)': misc.convert_blank(self.sy_to_entry.get()),
@@ -676,7 +645,7 @@ class StudentProfilePage(ProfilePage):
 		self.section_path = None
 		if section is not None:
 			sections = {section.name: section.path for section in \
-				self.master.sectionloader.items if section.grade_lvl == required['Grade Level']}
+				self.master.sectionloader.items if section.grade == required['Grade Level']}
 			try:
 				self.section_path = sections[section]
 			except KeyError:
@@ -728,6 +697,8 @@ class StudentProfilePage(ProfilePage):
 			
 		self.active_profile.dump()
 
+		self.master.reload_loaders(event)
+
 		return True
 
 	def lock(self, event=None) -> None:
@@ -736,7 +707,6 @@ class StudentProfilePage(ProfilePage):
 		self.parents_entry.config(state='disabled')
 		self.lrn_entry.config(state='disabled')
 		self.grade_cbox.config(state='disabled')
-		self.section_entry.config(state='disabled')
 		self.sy_from_entry.config(state='disabled')
 		self.sy_to_entry.config(state='disabled')
 
@@ -747,7 +717,6 @@ class StudentProfilePage(ProfilePage):
 		self.parents_entry.config(state='normal')
 		self.lrn_entry.config(state='normal')
 		self.grade_cbox.config(state='readonly')
-		self.section_entry.config(state='normal')
 		self.sy_from_entry.config(state='normal')
 		self.sy_to_entry.config(state='normal')
 
@@ -765,7 +734,7 @@ class StudentProfilePage(ProfilePage):
 		self.grade_cbox.config(font=('Bahnschrift Light', 14))
 
 		self.section_lbl.config(font=('Bahnschrift Light', 14))
-		self.section_entry.config(font=('Bahnschrift Light', 14))
+		self.section_btn.config(font=('Bahnschrift Light', 14))
 
 		self.sy1_lbl.config(font=('Bahnschrift Light', 14))
 		self.sy_from_entry.config(font=('Bahnschrift Light', 14))
@@ -776,19 +745,30 @@ class StudentProfilePage(ProfilePage):
 		self.lrn_entry_tt.font = ('Bahnschrift Light', 10)
 		self.grade_cbox_tt.font = ('Bahnschrift Light', 10)
 		self.section_entry_tt.font = ('Bahnschrift Light', 10)
+
 		if self.edit:
 			self.section_entry_tt.text = 'Section, Optional'
 		else:
 			self.section_entry_tt.text = 'Section, Click to Open'
 
-	def section_link(self, event=None) -> None:
+		try:
+			self.section_btn.config(text=data.Section.construct(self.section_path).name)
+		except (TypeError, OSError):
+			self.section_btn.config(text='None')
+
+	def section(self, event=None) -> None:
 		
 		if not self.edit and self.section_path is not None:
 			if os.path.exists(self.section_path):
 				self.master.protocol('WM_DELETE_WINDOW', self.master.exit)
 
-				# self.master.pagemng.pages['pfppage'] = SectionProfilePage.construct
+				self.master.pagemng.pages['pfppage'] = \
+					SectionProfilePage.load(data.Section.construct(self.section_path))
 				self.master.pagemng.previous_page = None
+
+		else:
+			#	TODO: make selecting sections possible
+			pass
 
 class TeacherProfilePage(ProfilePage):
 	def __init__(self, master: tk.Widget) -> None:
@@ -801,25 +781,19 @@ class TeacherProfilePage(ProfilePage):
 		#	Advisory Section Input:
 		self.advisorycls_input_frm = tk.Frame(self.teacher_frm)
 		self.advisorycls_input_lbl = tk.Label(master=self.advisorycls_input_frm, text='Advisory Class')
-		self.advisorycls_input_entry = tk.Entry(master=self.advisorycls_input_frm, relief='groove', bd=2)
+		self.advisorycls_btn = tk.Button(master=self.advisorycls_input_frm, text='None', height=1, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.section)
 
 		self.advisorycls_input_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.advisorycls_input_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.advisorycls_btn.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.advisorycls_input_frm.columnconfigure(1, weight=1)
 		self.advisorycls_input_frm.pack(fill='x', padx=10, pady=2)
 
 		#	Section
 		self.section_frm = tk.Frame(self.teacher_frm)
-
-		#	Input for the sections
-		self.section_input_frm = tk.Frame(self.section_frm)
-		self.section_input_lbl = tk.Label(master=self.section_input_frm, text='Section')
-		self.section_input_entry = tk.Entry(master=self.section_input_frm, relief='groove', bd=2)
-
-		self.section_input_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.section_input_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.section_input_frm.columnconfigure(1, weight=1)
-
+		self.section_lbl = tk.Label(master=self.section_frm, text='Advisory Class')
+		self.section_lbl.pack(fill='x', padx=6, pady=2)
 		self.inner_section_frm = tk.Frame(self.section_frm)
 		self.section_list_scrollbar = tk.Scrollbar(master=self.inner_section_frm)
 		self.section_list = tk.Listbox(master=self.inner_section_frm, yscrollcommand=self.section_list_scrollbar.set, 
@@ -844,7 +818,6 @@ class TeacherProfilePage(ProfilePage):
 		self.section_btns_frm.columnconfigure(1, weight=1)
 		self.section_btns_frm.columnconfigure(2, weight=1)
 
-		self.section_input_frm.pack(fill='x', pady=2)
 		self.inner_section_frm.pack(fill='x', pady=2)
 		self.section_btns_frm.pack(fill='x', pady=2)
 		self.section_frm.pack(fill='x', padx=10, pady=2)
@@ -854,22 +827,18 @@ class TeacherProfilePage(ProfilePage):
 		self.tabmng.add(self.teacher_frm, text='Teacher\'s Information')
 
 		self.dynresize.add_child(self.advisorycls_input_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.advisorycls_input_entry, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.section_input_lbl, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.section_input_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.advisorycls_btn, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.section_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.section_list, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.add_section_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.remove_section_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.open_section_btn, 'Bahnschrift Light', 14, 16, 6)
 
-		self.advisorycls_input_entry_tt = Tooltip(self.advisorycls_input_entry, text='Advisory Class, Optional')
-		self.section_input_entry_tt = Tooltip(self.section_input_entry, text='Add a Section')
+		self.advisorycls_btn_tt = Tooltip(self.advisorycls_btn, text='Advisory Class, Optional')
 		self.section_list_tt = Tooltip(self.section_list, text='All the Sections the Teacher Holds')
 		self.add_section_btn_tt = Tooltip(self.add_section_btn, text='Add a Section')
 		self.remove_section_btn_tt = Tooltip(self.remove_section_btn, text='Remove the Selected Section')
 		self.open_section_btn_tt = Tooltip(self.open_section_btn, text='Open the Selected Section')
-
-		self.advisorycls_input_entry.bind('<ButtonRelease-1>', self.section_link)
 
 	def lock(self, event=None) -> None:
 
@@ -893,20 +862,23 @@ class TeacherProfilePage(ProfilePage):
 		super().reload_page(event)
 
 		self.advisorycls_input_lbl.config(font=('Bahnschrift Light', 14))
-		self.advisorycls_input_entry.config(font=('Bahnschrift Light', 14))
-		self.section_input_lbl.config(font=('Bahnschrift Light', 14))
-		self.section_input_entry.config(font=('Bahnschrift Light', 14))
+		self.advisorycls_btn.config(font=('Bahnschrift Light', 14))
+		self.section_lbl.config(font=('Bahnschrift Light', 14))
 		self.section_list.config(font=('Bahnschrift Light', 14))
 		self.add_section_btn.config(font=('Bahnschrift Light', 14))
 		self.remove_section_btn.config(font=('Bahnschrift Light', 14))
 		self.open_section_btn.config(font=('Bahnschrift Light', 14))
 
-		self.advisorycls_input_entry_tt.font = ('Bahnschrift Light', 10)
-		self.section_input_entry_tt.font = ('Bahnschrift Light', 10)
+		self.advisorycls_btn_tt.font = ('Bahnschrift Light', 10)
 		self.section_list_tt.font = ('Bahnschrift Light', 10)
 		self.add_section_btn_tt.font = ('Bahnschrift Light', 10)
 		self.remove_section_btn_tt.font = ('Bahnschrift Light', 10)
 		self.open_section_btn_tt.font = ('Bahnschrift Light', 10)
+
+		try:
+			self.advisorycls_btn.config(text=data.Section.construct(self.section_path).name)
+		except (TypeError, OSError):
+			self.advisorycls_btn.config(text='None')
 
 		self.upd_section_list()
 
@@ -977,6 +949,8 @@ class TeacherProfilePage(ProfilePage):
 			
 		self.active_profile.dump()
 
+		self.master.reload_loaders(event)
+
 		return True
 
 	def add_section(self, event=None) -> None:
@@ -1000,7 +974,7 @@ class TeacherProfilePage(ProfilePage):
 		self.sections = [item for item in self.sections if os.path.exists(item[1])]
 		self.section_list.insert('end', *[item[0] for item in self.sections])
 
-	def section_link(self, event=None) -> None:
+	def section(self, event=None) -> None:
 		
 		if not self.edit and self.section_path is not None:
 			if os.path.exists(self.section_path):
@@ -1009,6 +983,10 @@ class TeacherProfilePage(ProfilePage):
 				self.master.pagemng.pages['pfppage'] = \
 					SectionProfilePage.load(data.Section.construct(self.section_path))
 				self.master.pagemng.previous_page = None
+
+		else:
+			#	TODO: make selecting sections possible
+			pass
 
 class SectionProfilePage(Page):
 	def __init__(self, master: tk.Widget) -> None:
@@ -1064,8 +1042,6 @@ class SectionProfilePage(Page):
 		self.teachers_lbl = tk.Label(master=self.general_frm, text='Teachers', anchor='w')
 		self.teachers_lbl.pack(fill='x', padx=10, pady=2)
 		self.teachers_frm = tk.Frame(self.general_frm)
-		self.teacher_entry = tk.Entry(master=self.teachers_frm, relief='groove', bd=2)
-		self.teacher_entry.pack(fill='x', padx=10, pady=2)
 		self.inner_teachers_frm = tk.Frame(self.teachers_frm)
 		self.teachers_list_scrollbar = tk.Scrollbar(master=self.inner_teachers_frm)
 		self.teachers_list = tk.Listbox(master=self.inner_teachers_frm, yscrollcommand=self.teachers_list_scrollbar.set, 
@@ -1097,8 +1073,6 @@ class SectionProfilePage(Page):
 		self.students_lbl = tk.Label(master=self.general_frm, text='Students', anchor='w')
 		self.students_lbl.pack(fill='x', padx=10, pady=2)
 		self.student_frm = tk.Frame(self.general_frm)
-		self.teacher_entry = tk.Entry(master=self.student_frm, relief='groove', bd=2)
-		self.teacher_entry.pack(fill='x', padx=10, pady=2)
 		self.inner_student_frm = tk.Frame(self.student_frm)
 		self.student_list_scrollbar = tk.Scrollbar(master=self.inner_student_frm)
 		self.students_list = tk.Listbox(master=self.inner_student_frm, yscrollcommand=self.student_list_scrollbar.set, 
@@ -1328,6 +1302,8 @@ class SectionProfilePage(Page):
 			
 		self.active_section.dump()
 
+		self.master.reload_loaders(event)
+
 		return True
 
 	def toggle_edit(self, event=None) -> None:
@@ -1348,6 +1324,69 @@ class SectionProfilePage(Page):
 
 	def add_teacher(self, event=None) -> None:
 		pass
+
+class OpenPage(Page):
+	def __init__(self, master: tk.Widget) -> None:
+		super().__init__(master=master)
+
+		self.inner_frm = tk.Frame(master=self)
+		self.title = tk.Label(master=self.inner_frm, text='Open a Profile')
+		self.title.pack(expand=True, fill='x', side='top', pady=10)
+
+		#	Open List
+		self.open_frm = tk.Frame(self.inner_frm)
+		self.search_frm = tk.Frame(self.open_frm)
+		self.search_lbl = tk.Label(master=self.search_frm, text='Advisory Class')
+		self.search_entry = tk.Entry(master=self.search_frm, relief='groove', bd=2)
+
+		self.search_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.search_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.search_frm.columnconfigure(1, weight=1)
+		self.search_frm.pack(fill='x', padx=10, pady=2)
+		self.inner_open_frm = tk.Frame(self.open_frm)
+		self.open_list_scrollbar = tk.Scrollbar(master=self.inner_open_frm)
+		self.open_list = tk.Listbox(master=self.inner_open_frm, yscrollcommand=self.open_list_scrollbar.set, 
+			relief='groove', bd=2)
+		self.open_list_scrollbar.config(command=self.open_list.yview)
+		self.open_list_scrollbar.pack(fill='y', side='right')
+		self.open_list.pack(expand=True, fill='both', side='left')
+
+		self.open_btns_frm = tk.Frame(self.open_frm)
+		self.open_open_btn = tk.Button(master=self.open_btns_frm, text='Open', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+		self.remove_open_btn = tk.Button(master=self.open_btns_frm, text='Remove', height=2, 
+			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
+
+		self.open_open_btn.grid(column=0, row=0, sticky='nsew', padx=6, pady=2)
+		self.remove_open_btn.grid(column=1, row=0, sticky='nsew', padx=6, pady=2)
+		self.open_btns_frm.columnconfigure(0, weight=1)
+		self.open_btns_frm.columnconfigure(1, weight=1)
+
+		self.inner_open_frm.pack(fill='x', pady=2)
+		self.open_btns_frm.pack(fill='x', pady=2)
+		self.open_frm.pack(fill='x', padx=10, pady=2)
+
+		self.back_btn = tk.Button(master=self.inner_frm, text='Back', 
+			height=2, relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb',
+			command=self.back)
+		self.back_btn.pack(expand=True, fill='x', padx=10, pady=(10, 0))
+
+		self.dynresize = DynamicResize(self)
+		self.dynresize.add_child(self.title, 'Bahnschrift', 36, 40, 10)
+		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 14, 16, 6)
+
+		self.back_btn_tt = Tooltip(self.back_btn, 
+			text='Go Back to Previous Page', font=('Bahnschrift Light', 10))
+		self.inner_frm.pack(expand=True, fill='x', padx=30)
+
+		self.reload_page()
+
+	def reload_page(self, event=None) -> None:
+		pass
+
+	def back(self) -> None:
+
+		self.master.pagemng.back()
 
 class PageManager:
 	def __init__(self) -> None:
