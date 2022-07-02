@@ -103,12 +103,12 @@ class DataLoader(ABC):
 		return pickle.dumps(self)
 
 class Section(DataLoader):
-	def __init__(self, path: str, name: str, adviser: str, grade: str) -> None:
+	def __init__(self, path: str, name: str, grade: str) -> None:
 		super().__init__(path)
 
 		self.name: str = name
-		self.adviser: str = adviser
 		self.grade: str = grade
+		self.adviser: str = None
 		self.teachers: List[str] = []
 		self.students: List[str] = []
 

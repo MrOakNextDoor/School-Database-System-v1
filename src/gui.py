@@ -420,17 +420,12 @@ class ProfilePage(Page):
 			self._edit = value
 		else:
 			if self.save():
+				self.lock()
 				self._edit = value
 			else:
 				return
 
 		self.reload_page()
-	
-	def save(self) -> bool:
-		
-		#	Do some saving of the info here
-
-		self.lock()
 
 	def back(self, event=None) -> None:
 
@@ -686,6 +681,7 @@ class StudentProfilePage(ProfilePage):
 				self.section_path = sections[section]
 			except KeyError:
 				msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
+				self.section_entry.delete(0, 'end')
 				return
 
 		try:
@@ -731,8 +727,6 @@ class StudentProfilePage(ProfilePage):
 				misc.convert_blank(self.lname_entry.get()))
 			
 		self.active_profile.dump()
-
-		super().save()
 
 		return True
 
@@ -831,8 +825,6 @@ class TeacherProfilePage(ProfilePage):
 		self.section_list = tk.Listbox(master=self.inner_section_frm, yscrollcommand=self.section_list_scrollbar.set, 
 			relief='groove', bd=2)
 		self.section_list_scrollbar.config(command=self.section_list.yview)
-		for i in range(1, 101):
-			self.section_list.insert(tk.END, f'Section No. {i}')
 		self.section_list_scrollbar.pack(fill='y', side='right')
 		self.section_list.pack(expand=True, fill='both', side='left')
 
@@ -941,7 +933,10 @@ class TeacherProfilePage(ProfilePage):
 				self.section_path: str = sections[section]
 			except KeyError:
 				msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
+				self.advisorycls_input_entry.delete(0, 'end')
 				return
+
+		self.upd_section_list(event)
 
 		try:
 			self.active_profile.path = os.path.join(constants.PATHS.STUDENTS.value,
@@ -955,7 +950,6 @@ class TeacherProfilePage(ProfilePage):
 			self.active_profile.address = required['Address']
 			self.active_profile.sex = required['Gender']
 			self.active_profile.advisory_cls = self.section_path
-			self.active_profile.sections = self.sections
 			self.active_profile.contact_no = misc.convert_blank(self.contact_entry.get())
 			self.active_profile.email = misc.convert_blank(self.email_entry.get())
 			self.active_profile.mname = misc.convert_blank(self.mname_entry.get())
@@ -973,15 +967,15 @@ class TeacherProfilePage(ProfilePage):
 				required['Address'],
 				required['Gender'],
 				self.section_path,
-				self.sections,
+				[data.Section.construct(item[1]) for item in self.sections],
 				misc.convert_blank(self.contact_entry.get()),
 				misc.convert_blank(self.email_entry.get()),
 				misc.convert_blank(self.mname_entry.get()),
 				misc.convert_blank(self.lname_entry.get()))
+
+		self.active_profile.sections = self.sections
 			
 		self.active_profile.dump()
-
-		super().save()
 
 		return True
 
@@ -994,7 +988,7 @@ class TeacherProfilePage(ProfilePage):
 				self.master.sectionloader.items}
 			try:
 				section_path = sections[target]
-				self.sections.append([target, section_path])
+				self.active_profile.append([target, section_path])
 				self.upd_section_list(self, event)
 			except KeyError:
 				msgbox.showerror(constants.TITLE, f'The section \'{target}\' does not exist.')
@@ -1002,10 +996,8 @@ class TeacherProfilePage(ProfilePage):
 
 	def upd_section_list(self, event=None) -> None:
 
-		for item in self.sections:
-			if not os.path.exists(item[1]):
-				self.sections.remove(item)
-
+		self.section_list.delete(0, 'end')
+		self.sections = [item for item in self.sections if os.path.exists(item[1])]
 		self.section_list.insert('end', *[item[0] for item in self.sections])
 
 	def section_link(self, event=None) -> None:
@@ -1023,6 +1015,10 @@ class SectionProfilePage(Page):
 		super().__init__(master=master)
 
 		self._edit = True
+		self.adviser_path = None
+		self.active_section = None
+		self.teachers = []
+		self.students = []
 
 		#	Tab Manager
 		self.tabmng = ttk.Notebook(master=self)
@@ -1068,6 +1064,8 @@ class SectionProfilePage(Page):
 		self.teachers_lbl = tk.Label(master=self.general_frm, text='Teachers', anchor='w')
 		self.teachers_lbl.pack(fill='x', padx=10, pady=2)
 		self.teachers_frm = tk.Frame(self.general_frm)
+		self.teacher_entry = tk.Entry(master=self.teachers_frm, relief='groove', bd=2)
+		self.teacher_entry.pack(fill='x', padx=10, pady=2)
 		self.inner_teachers_frm = tk.Frame(self.teachers_frm)
 		self.teachers_list_scrollbar = tk.Scrollbar(master=self.inner_teachers_frm)
 		self.teachers_list = tk.Listbox(master=self.inner_teachers_frm, yscrollcommand=self.teachers_list_scrollbar.set, 
@@ -1099,6 +1097,8 @@ class SectionProfilePage(Page):
 		self.students_lbl = tk.Label(master=self.general_frm, text='Students', anchor='w')
 		self.students_lbl.pack(fill='x', padx=10, pady=2)
 		self.student_frm = tk.Frame(self.general_frm)
+		self.teacher_entry = tk.Entry(master=self.student_frm, relief='groove', bd=2)
+		self.teacher_entry.pack(fill='x', padx=10, pady=2)
 		self.inner_student_frm = tk.Frame(self.student_frm)
 		self.student_list_scrollbar = tk.Scrollbar(master=self.inner_student_frm)
 		self.students_list = tk.Listbox(master=self.inner_student_frm, yscrollcommand=self.student_list_scrollbar.set, 
@@ -1229,6 +1229,8 @@ class SectionProfilePage(Page):
 		self.remove_teacher_btn_tt.font = ('Bahnschrift Light', 10)
 		self.open_teacher_btn_tt.font = ('Bahnschrift Light', 10)
 		self.back_btn_tt.font = ('Bahnschrift Light', 10)
+		
+		self.upd_lists()
 	
 	def back(self, event=None) -> None:
 
@@ -1281,10 +1283,71 @@ class SectionProfilePage(Page):
 		self.remove_student_btn.config(state='normal')
 
 	def save(self, event=None) -> bool:
+
+		required = {
+			'Name': misc.convert_blank(self.name_entry.get()),
+			'Grade Level': misc.convert_blank(self.grade_cbox.get())
+		}
+
+		for key, info in required.items():
+			if info is None:
+				msgbox.showerror(constants.TITLE, f'{key} required.')
+				return False
+
+		adviser = misc.convert_blank(self.adviser_entry.get())
+		self.adviser_path = None
+		if adviser is not None:
+			advisers = {adviser.name: adviser.path for adviser in \
+				self.master.teacherloader.items}
+			try:
+				self.adviser_path: str = advisers[adviser]
+			except KeyError:
+				msgbox.showerror(constants.TITLE, f'Teacher \'{adviser}\' does not exist.')
+				return
+
+		self.upd_lists(event)
+
+		try:
+			self.active_section.path = os.path.join(constants.PATHS.SECTIONS.value,
+					constants.FILENAME_FORMATS.SECTION.value.format(
+						glvl=required['Grade Level'].replace(' ', ''),
+						name=required['Name'].replace(' ', '')))
+			self.active_section.grade = required['Grade Level']
+			self.active_section.name = required['Name']
+		except (AttributeError, OSError):
+			self.active_section = data.Section(
+				os.path.join(constants.PATHS.SECTIONS.value,
+					constants.FILENAME_FORMATS.SECTION.value.format(
+						glvl=required['Grade Level'].replace(' ', ''),
+						name=required['Name'].replace(' ', ''))),
+				required['Name'],
+				required['Grade Level'])
+
+		self.active_section.students = self.students
+		self.active_section.teachers = self.teachers
+			
+		self.active_section.dump()
+
 		return True
 
 	def toggle_edit(self, event=None) -> None:
 		self.edit = not self.edit
+
+	def upd_lists(self, event=None) -> None:
+		
+		self.teachers_list.delete(0, 'end')
+		self.teachers = [item for item in self.teachers if os.path.exists(item[1])]
+		self.teachers_list.insert('end', *[item[0] for item in self.teachers])
+
+		self.students_list.delete(0, 'end')
+		self.students = [item for item in self.students if os.path.exists(item[1])]
+		self.students_list.insert('end', *[item[0] for item in self.students])
+
+	def add_student(self, event=None) -> None:
+		pass
+
+	def add_teacher(self, event=None) -> None:
+		pass
 
 class PageManager:
 	def __init__(self) -> None:
