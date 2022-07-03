@@ -6,7 +6,7 @@ import pickle
 from abc import ABC, abstractmethod
 from datetime import date
 from PIL import ImageTk
-from typing import Dict, List, Literal, Type, Optional, Tuple, Union
+from typing import Dict, List, Literal, Type, Optional, Tuple, Union, Any
 
 import constants
 
@@ -355,3 +355,18 @@ class TeacherLoader(PathLoader):
 		self.items.clear()
 		for path in self.get_all():
 			self.items.append(Teacher.construct(os.path.join(self.path, path)))
+
+def search(profiles: List[Union[Person, Section]], filters: Dict[str, Any]) -> List[Dict[str, Any]]:
+	
+	search_results = []
+
+	for p in profiles:
+		profile = {key.remove('_'): value for key, value in p.__dict__.items()}
+		profile['type'] = type(p).__name__
+		try:
+			if all([profile[key] == value for key, value in filters.items()]):
+				search_results.append(p)
+		except KeyError:
+			continue
+
+	return search_results

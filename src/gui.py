@@ -641,17 +641,18 @@ class StudentProfilePage(ProfilePage):
 				msgbox.showerror(constants.TITLE, f'{key} required.')
 				return False
 
-		section = misc.convert_blank(self.section_entry.get())
-		self.section_path = None
-		if section is not None:
-			sections = {section.name: section.path for section in \
-				self.master.sectionloader.items if section.grade == required['Grade Level']}
-			try:
-				self.section_path = sections[section]
-			except KeyError:
-				msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
-				self.section_entry.delete(0, 'end')
-				return
+		#	TODO: Change this to the new search system
+		# section = misc.convert_blank(self.section_entry.get())
+		# self.section_path = None
+		# if section is not None:
+		# 	sections = {section.name: section.path for section in \
+		# 		self.master.sectionloader.items if section.grade == required['Grade Level']}
+		# 	try:
+		# 		self.section_path = sections[section]
+		# 	except KeyError:
+		# 		msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
+		# 		self.section_entry.delete(0, 'end')
+		# 		return
 
 		try:
 			self.active_profile.path = os.path.join(constants.PATHS.STUDENTS.value,
@@ -844,16 +845,12 @@ class TeacherProfilePage(ProfilePage):
 
 		super().lock(event)
 
-		self.advisorycls_input_entry.config(state='disabled')
-		self.section_input_entry.config(state='disabled')
 		self.add_section_btn.config(state='disabled')
 		self.remove_section_btn.config(state='disabled')
 
 	def unlock(self, event=None) -> None:
 		
 		super().unlock(event)
-		self.advisorycls_input_entry.config(state='disabled')
-		self.section_input_entry.config(state='disabled')
 		self.add_section_btn.config(state='disabled')
 		self.remove_section_btn.config(state='disabled')
 
@@ -896,17 +893,18 @@ class TeacherProfilePage(ProfilePage):
 				msgbox.showerror(constants.TITLE, f'{key} required.')
 				return False
 
-		section = misc.convert_blank(self.advisorycls_input_entry.get())
-		self.section_path = None
-		if section is not None:
-			sections = {section.name: section.path for section in \
-				self.master.sectionloader.items}
-			try:
-				self.section_path: str = sections[section]
-			except KeyError:
-				msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
-				self.advisorycls_input_entry.delete(0, 'end')
-				return
+		#	TODO: Change this to the new search system
+		# section = misc.convert_blank(self.advisorycls_input_entry.get())
+		# self.section_path = None
+		# if section is not None:
+		# 	sections = {section.name: section.path for section in \
+		# 		self.master.sectionloader.items}
+		# 	try:
+		# 		self.section_path: str = sections[section]
+		# 	except KeyError:
+				# msgbox.showerror(constants.TITLE, f'The section \'{section}\' does not exist.')
+				# self.advisorycls_input_entry.delete(0, 'end')
+				# return
 
 		self.upd_section_list(event)
 
@@ -1336,7 +1334,7 @@ class OpenPage(Page):
 		#	Open List
 		self.open_frm = tk.Frame(self.inner_frm)
 		self.search_frm = tk.Frame(self.open_frm)
-		self.search_lbl = tk.Label(master=self.search_frm, text='Advisory Class')
+		self.search_lbl = tk.Label(master=self.search_frm, text='Search')
 		self.search_entry = tk.Entry(master=self.search_frm, relief='groove', bd=2)
 
 		self.search_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
@@ -1351,19 +1349,11 @@ class OpenPage(Page):
 		self.open_list_scrollbar.pack(fill='y', side='right')
 		self.open_list.pack(expand=True, fill='both', side='left')
 
-		self.open_btns_frm = tk.Frame(self.open_frm)
-		self.open_open_btn = tk.Button(master=self.open_btns_frm, text='Open', height=2, 
+		self.open_btn = tk.Button(master=self.open_frm, text='Open', height=2, 
 			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
-		self.remove_open_btn = tk.Button(master=self.open_btns_frm, text='Remove', height=2, 
-			relief='solid', bd=0, bg='#e6e6e6', activebackground='#ebebeb')
-
-		self.open_open_btn.grid(column=0, row=0, sticky='nsew', padx=6, pady=2)
-		self.remove_open_btn.grid(column=1, row=0, sticky='nsew', padx=6, pady=2)
-		self.open_btns_frm.columnconfigure(0, weight=1)
-		self.open_btns_frm.columnconfigure(1, weight=1)
 
 		self.inner_open_frm.pack(fill='x', pady=2)
-		self.open_btns_frm.pack(fill='x', pady=2)
+		self.open_btn.pack(fill='x', padx=6, pady=2)
 		self.open_frm.pack(fill='x', padx=10, pady=2)
 
 		self.back_btn = tk.Button(master=self.inner_frm, text='Back', 
@@ -1371,13 +1361,20 @@ class OpenPage(Page):
 			command=self.back)
 		self.back_btn.pack(expand=True, fill='x', padx=10, pady=(10, 0))
 
+		self.inner_frm.pack(expand=True, fill='x', padx=30)
+
 		self.dynresize = DynamicResize(self)
 		self.dynresize.add_child(self.title, 'Bahnschrift', 36, 40, 10)
+		self.dynresize.add_child(self.search_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.open_btn, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.back_btn, 'Bahnschrift Light', 14, 16, 6)
 
 		self.back_btn_tt = Tooltip(self.back_btn, 
 			text='Go Back to Previous Page', font=('Bahnschrift Light', 10))
-		self.inner_frm.pack(expand=True, fill='x', padx=30)
+		self.search_entry_tt = Tooltip(self.search_entry, 
+			text='Search for a Profile', font=('Bahnschrift Light', 10))
+		self.open_btn_tt = Tooltip(self.open_btn, 
+			text='Open the Selected Profile', font=('Bahnschrift Light', 10))
 
 		self.reload_page()
 
