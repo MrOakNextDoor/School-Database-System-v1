@@ -1477,8 +1477,30 @@ class PersonPanel(Page):
 		self.dynresize.add_child(self.email_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.email_entry, 'Bahnschrift Light', 14, 16, 6)
 
+		self.name_entry_tt = Tooltip(self.name_entry, text='Name')
+		self.address_entry_tt = Tooltip(self.address_entry, text='Address')
+		self.gender_cbox_tt = Tooltip(self.gender_cbox, text='Gender')
+		self.contactno_entry_tt = Tooltip(self.contactno_entry, text='Contact Number')
+		self.email_entry_tt = Tooltip(self.email_entry, text='E-mail Address')
+
 	def reload_page(self, event=None) -> None:
-		pass
+
+		self.name_lbl.config(font=('Bahnschrift Light', 14))
+		self.name_entry.config(font=('Bahnschrift Light', 14))
+		self.address_lbl.config(font=('Bahnschrift Light', 14))
+		self.address_entry.config(font=('Bahnschrift Light', 14))
+		self.gender_lbl.config(font=('Bahnschrift Light', 14))
+		self.gender_cbox.config(font=('Bahnschrift Light', 14))
+		self.contactno_lbl.config(font=('Bahnschrift Light', 14))
+		self.contactno_lbl.config(font=('Bahnschrift Light', 14))
+		self.email_entry.config(font=('Bahnschrift Light', 14))
+		self.email_entry.config(font=('Bahnschrift Light', 14))
+
+		self.name_entry_tt.font=('Bahnschrift Light', 10)
+		self.address_entry_tt.font=('Bahnschrift Light', 10)
+		self.gender_cbox_tt.font=('Bahnschrift Light', 10)
+		self.contactno_entry_tt.font=('Bahnschrift Light', 10)
+		self.email_entry_tt.font=('Bahnschrift Light', 10)
 
 class StudentPanel(PersonPanel):
 	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
@@ -1556,11 +1578,38 @@ class StudentPanel(PersonPanel):
 		self.dynresize.add_child(self.section_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.section_entry, 'Bahnschrift Light', 14, 16, 6)
 
+		self.lrn_entry_tt = Tooltip(self.lrn_entry, text='Learner\'s Reference Number')
+		self.sy_from_entry_tt = Tooltip(self.sy_from_entry, text='School Year (From)')
+		self.sy_to_entry_tt = Tooltip(self.sy_to_entry, text='School Year (From)')
+		self.parents_entry_tt = Tooltip(self.parents_entry, text='School Year (From)')
+		self.grade_cbox_tt = Tooltip(self.grade_cbox, text='School Year (From)')
+		self.section_entry_tt = Tooltip(self.section_entry, text='School Year (From)')
+
 		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
 		
 		super().reload_page(event)
+
+		self.lrn_lbl.config(font=('Bahnschrift Light', 14))
+		self.lrn_entry.config(font=('Bahnschrift Light', 14))
+		self.sy_from_lbl.config(font=('Bahnschrift Light', 14))
+		self.sy_from_entry.config(font=('Bahnschrift Light', 14))
+		self.sy_to_lbl.config(font=('Bahnschrift Light', 14))
+		self.sy_to_entry.config(font=('Bahnschrift Light', 14))
+		self.parents_lbl.config(font=('Bahnschrift Light', 14))
+		self.parents_entry.config(font=('Bahnschrift Light', 14))
+		self.grade_lbl.config(font=('Bahnschrift Light', 14))
+		self.grade_cbox.config(font=('Bahnschrift Light', 14))
+		self.section_lbl.config(font=('Bahnschrift Light', 14))
+		self.section_entry.config(font=('Bahnschrift Light', 14))
+
+		self.lrn_entry_tt.font=('Bahnschrift Light', 10)
+		self.sy_from_entry_tt.font=('Bahnschrift Light', 10)
+		self.sy_to_entry_tt.font=('Bahnschrift Light', 10)
+		self.parents_entry_tt.font=('Bahnschrift Light', 10)
+		self.grade_cbox_tt.font=('Bahnschrift Light', 10)
+		self.section_entry_tt.font=('Bahnschrift Light', 10)
 
 class TeacherPanel(PersonPanel):
 	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
@@ -1591,11 +1640,22 @@ class TeacherPanel(PersonPanel):
 		self.dynresize.add_child(self.sections_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.sections_entry, 'Bahnschrift Light', 14, 16, 6)
 
+		self.advisorycls_entry_tt = Tooltip(self.advisorycls_entry, 'Adivsory Class')
+		self.sections_entry_tt = Tooltip(self.sections_entry, 'Sections the Teacher Handles, Separated with Comma')
+
 		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
 		
 		super().reload_page(event)
+
+		self.advisorycls_lbl.config(font=('Bahnschrift Light', 14))
+		self.advisorycls_entry.config(font=('Bahnschrift Light', 14))
+		self.sections_lbl.config(font=('Bahnschrift Light', 14))
+		self.sections_entry.config(font=('Bahnschrift Light', 14))
+
+		self.advisorycls_entry_tt.font=('Bahnschrift Light', 10)
+		self.sections_entry_tt.font=('Bahnschrift Light', 10)
 
 class SectionPanel(Page):
 	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
@@ -1624,11 +1684,25 @@ class SectionPanel(Page):
 		self.grade_frm.pack(fill='x', padx=10, pady=2)
 
 		self.dynresize = dynresize
+		self.dynresize.add_child(self.name_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.name_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.grade_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.grade_cbox, 'Bahnschrift Light', 14, 16, 6)
+
+		self.name_entry_tt = Tooltip(self.name_entry, 'Name of Section')
+		self.grade_cbox_tt = Tooltip(self.grade_cbox, 'Grade')
 
 		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
-		pass
+		
+		self.name_lbl.config(font=('Bahnschrift Light', 14))
+		self.name_entry.config(font=('Bahnschrift Light', 14))
+		self.grade_lbl.config(font=('Bahnschrift Light', 14))
+		self.grade_cbox.config(font=('Bahnschrift Light', 14))
+
+		self.name_entry_tt.font=('Bahnschrift Light', 10)
+		self.grade_cbox_tt.font=('Bahnschrift Light', 10)
 
 class PageManager:
 	def __init__(self) -> None:
