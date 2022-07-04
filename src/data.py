@@ -5,8 +5,9 @@ import os
 import pickle
 from abc import ABC, abstractmethod
 from datetime import date
+from typing import Any, Dict, List, Literal, Optional, Tuple, Type, Union
+
 from PIL import ImageTk
-from typing import Dict, List, Literal, Type, Optional, Tuple, Union, Any
 
 import constants
 
@@ -358,15 +359,33 @@ class TeacherLoader(PathLoader):
 
 def search(profiles: List[Union[Person, Section]], filters: Dict[str, Any]) -> List[Dict[str, Any]]:
 	
-	search_results = []
+	results = []
 
 	for p in profiles:
-		profile = {key.remove('_'): value for key, value in p.__dict__.items()}
+		profile = {key: value for key, value in p.__dict__.items() if not key.startswith('_')}
 		profile['type'] = type(p).__name__
+
 		try:
-			if all([profile[key] == value for key, value in filters.items()]):
-				search_results.append(p)
+			profile['name'] = p.get_full_name()
+			profile.pop('fname')
+			profile.pop('mname')
+			profile.pop('lname')
+		except AttributeError:
+			pass
+
+		try:
+			checks = []
+
+			for key, value in filters.items():
+				if isinstance(profile[key], str):
+					checks.append(profile[key] in value)
+				else:
+					checks.append(profile[key] == value)
+			
+			if all(checks):
+				results.append(p)
+
 		except KeyError:
 			continue
 
-	return search_results
+	return results

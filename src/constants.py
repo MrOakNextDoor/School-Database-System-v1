@@ -3,7 +3,9 @@
 #   Libraries
 import os.path
 from enum import Enum
+
 from PIL import Image
+
 
 #   Code
 class DEFAULT_SETTINGS(Enum):

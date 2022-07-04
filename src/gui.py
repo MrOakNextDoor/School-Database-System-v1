@@ -1,18 +1,21 @@
 #   Handles how the app looks
 
 #   Libraries
-import tkinter as tk
 import os
+import tkinter as tk
 from abc import ABC, abstractmethod
-from PIL import ImageTk, Image
-from tkcalendar import DateEntry
-from tkinter import filedialog, ttk
+from tkinter import filedialog
 from tkinter import messagebox as msgbox
-from typing import Any, Dict, Tuple, List
+from tkinter import ttk
+from typing import Any, Dict, List, Tuple, Union
+
+from PIL import Image, ImageTk
+from tkcalendar import DateEntry
 
 import constants
 import data
 import misc
+
 
 #   Code
 class Page(ABC, tk.Frame):
@@ -1384,6 +1387,48 @@ class OpenPage(Page):
 	def back(self) -> None:
 
 		self.master.pagemng.back()
+
+class SearchFilterPage(Page):
+	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
+		super().__init__(master=master)
+		
+		self.filtermng = PageManager()
+
+		self.studentpanel = StudentPanel()
+		self.teacherpanel = TeacherPanel()
+		self.sectionpanel = SectionPanel()
+
+		self.filtermng.add_page('studentpanel')
+		self.filtermng.add_page('teacherpanel')
+		self.filtermng.add_page('sectionpanel')
+
+		self.dynresize = dynresize
+
+
+	def reload_page(self, event=None) -> None:
+		pass
+
+class StudentPanel(Page):
+	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
+		super().__init__(master)
+
+	def reload_page(self, event=None) -> None:
+		pass
+
+class TeacherPanel(Page):
+	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
+		super().__init__(master)
+
+	def reload_page(self, event=None) -> None:
+		pass
+
+class SectionPanel(Page):
+	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
+		super().__init__(master)
+
+	def reload_page(self, event=None) -> None:
+		pass
+
 
 class PageManager:
 	def __init__(self) -> None:

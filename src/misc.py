@@ -1,7 +1,7 @@
 #   Provides miscellaneous functionality.
 
 #   Libraries
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 
 #   Code
