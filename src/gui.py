@@ -582,14 +582,14 @@ class StudentProfilePage(ProfilePage):
 
 		#	School Year
 		self.sy_frm = tk.Frame(master=self.student_frm)
-		self.sy1_lbl = tk.Label(master=self.sy_frm, text='School Year (From)')
+		self.sy_from_lbl = tk.Label(master=self.sy_frm, text='School Year (From)')
 		self.sy_from_entry = tk.Entry(master=self.sy_frm, relief='groove', bd=2)
-		self.sy2_lbl = tk.Label(master=self.sy_frm, text='School Year (To)')
+		self.sy_to_lbl = tk.Label(master=self.sy_frm, text='School Year (To)')
 		self.sy_to_entry = tk.Entry(master=self.sy_frm, relief='groove', bd=2)
 
-		self.sy1_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy_from_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.sy_from_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.sy2_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy_to_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.sy_to_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 		
 		self.sy_frm.columnconfigure(1, weight=1)
@@ -613,9 +613,9 @@ class StudentProfilePage(ProfilePage):
 		self.dynresize.add_child(self.grade_cbox, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.section_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.section_btn, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.sy1_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy_from_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.sy_from_entry, 'Bahnschrift Light', 14, 16, 6)
-		self.dynresize.add_child(self.sy2_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy_to_lbl, 'Bahnschrift Light', 14, 16, 6)
 		self.dynresize.add_child(self.sy_to_entry, 'Bahnschrift Light', 14, 16, 6)
 
 		self.parent_entry_tt = Tooltip(self.parents_entry, text='Parents, Separate w/ Comma, Optional')
@@ -740,9 +740,9 @@ class StudentProfilePage(ProfilePage):
 		self.section_lbl.config(font=('Bahnschrift Light', 14))
 		self.section_btn.config(font=('Bahnschrift Light', 14))
 
-		self.sy1_lbl.config(font=('Bahnschrift Light', 14))
+		self.sy_from_lbl.config(font=('Bahnschrift Light', 14))
 		self.sy_from_entry.config(font=('Bahnschrift Light', 14))
-		self.sy2_lbl.config(font=('Bahnschrift Light', 14))
+		self.sy_to_lbl.config(font=('Bahnschrift Light', 14))
 		self.sy_to_entry.config(font=('Bahnschrift Light', 14))
 		
 		self.parent_entry_tt.font = ('Bahnschrift Light', 10) 
@@ -1466,6 +1466,16 @@ class PersonPanel(Page):
 		self.email_frm.pack(fill='x', padx=10, pady=2)
 
 		self.dynresize = dynresize
+		self.dynresize.add_child(self.name_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.name_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.address_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.address_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.gender_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.gender_cbox, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.contactno_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.contactno_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.email_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.email_entry, 'Bahnschrift Light', 14, 16, 6)
 
 	def reload_page(self, event=None) -> None:
 		pass
@@ -1486,14 +1496,14 @@ class StudentPanel(PersonPanel):
 
 		#	School Year
 		self.sy_frm = tk.Frame(master=self)
-		self.sy1_lbl = tk.Label(master=self.sy_frm, text='School Year (From)')
+		self.sy_from_lbl = tk.Label(master=self.sy_frm, text='School Year (From)')
 		self.sy_from_entry = tk.Entry(master=self.sy_frm, relief='groove', bd=2)
-		self.sy2_lbl = tk.Label(master=self.sy_frm, text='School Year (To)')
+		self.sy_to_lbl = tk.Label(master=self.sy_frm, text='School Year (To)')
 		self.sy_to_entry = tk.Entry(master=self.sy_frm, relief='groove', bd=2)
 
-		self.sy1_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy_from_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.sy_from_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
-		self.sy2_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy_to_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.sy_to_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 		
 		self.sy_frm.columnconfigure(1, weight=1)
@@ -1533,6 +1543,19 @@ class StudentPanel(PersonPanel):
 
 		self.section_frm.pack(fill='x', padx=10, pady=2)
 
+		self.dynresize.add_child(self.lrn_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.lrn_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy_from_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy_from_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy_to_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sy_to_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.parents_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.parents_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.grade_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.grade_cbox, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.section_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.section_entry, 'Bahnschrift Light', 14, 16, 6)
+
 		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
@@ -1555,13 +1578,18 @@ class TeacherPanel(PersonPanel):
 
 		#	Sections
 		self.sections_frm = tk.Frame(master=self)
-		self.sections_lbl = tk.Label(master=self.sections_frm, text='Handled Sections (Sep. w/ Comma)')
+		self.sections_lbl = tk.Label(master=self.sections_frm, text='Sections (Sep. w/ Comma)')
 		self.sections_entry = tk.Entry(master=self.sections_frm, relief='groove', bd=2)
 
 		self.sections_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
 		self.sections_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
 
 		self.sections_frm.pack(fill='x', padx=10, pady=2)
+
+		self.dynresize.add_child(self.advisorycls_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.advisorycls_entry, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sections_lbl, 'Bahnschrift Light', 14, 16, 6)
+		self.dynresize.add_child(self.sections_entry, 'Bahnschrift Light', 14, 16, 6)
 
 		self.reload_page()
 
