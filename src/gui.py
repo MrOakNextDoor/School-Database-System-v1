@@ -301,7 +301,7 @@ class ProfilePage(Page):
 
 		#	Contacts
 		self.contacts_frm = tk.Frame(master=self.general_frm)
-		self.email_lbl = tk.Label(master=self.contacts_frm, text='Email Address')
+		self.email_lbl = tk.Label(master=self.contacts_frm, text='E-mail Address')
 		self.email_entry = tk.Entry(master=self.contacts_frm, relief='groove', bd=2)
 		self.contact_lbl = tk.Label(master=self.contacts_frm, text='Contact Number')
 		self.contact_entry = tk.Entry(master=self.contacts_frm, relief='groove', bd=2)
@@ -318,7 +318,7 @@ class ProfilePage(Page):
 
 		#	Gender
 		self.gender_frm = tk.Frame(master=self.general_frm)
-		self.gender_lbl = tk.Label(master=self.gender_frm, text='Gender / Sex')
+		self.gender_lbl = tk.Label(master=self.gender_frm, text='Gender')
 		self.gender_cbox = ttk.Combobox(master=self.gender_frm, state='readonly', values=constants.GENDERS)
 
 		self.gender_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
@@ -373,7 +373,7 @@ class ProfilePage(Page):
 		self.address_entry_tt = Tooltip(self.address_entry, text='Address')
 		self.bday_entry_tt = Tooltip(self.bday_entry, text='Birthday in MM/DD/YYYY format')
 		self.contact_entry_tt = Tooltip(self.contact_entry, text='Contact Number, Optional')
-		self.email_entry_tt = Tooltip(self.email_entry, text='Email Address, Optional')
+		self.email_entry_tt = Tooltip(self.email_entry, text='E-mail Address, Optional')
 		self.gender_cbox_tt = Tooltip(self.gender_cbox, text='Gender')
 		self.edit_toggle_btn_tt = Tooltip(self.edit_toggle_btn, text='Save the Profile')
 		self.back_btn_tt = Tooltip(self.back_btn, text='Go Back to Menu')
@@ -1392,43 +1392,215 @@ class SearchFilterPage(Page):
 	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
 		super().__init__(master=master)
 		
-		self.filtermng = PageManager()
+		self.panelmng = PageManager()
 
-		self.studentpanel = StudentPanel()
-		self.teacherpanel = TeacherPanel()
-		self.sectionpanel = SectionPanel()
+		self.studentpanel = StudentPanel(self, dynresize)
+		self.teacherpanel = TeacherPanel(self, dynresize)
+		self.sectionpanel = SectionPanel(self, dynresize)
 
-		self.filtermng.add_page('studentpanel')
-		self.filtermng.add_page('teacherpanel')
-		self.filtermng.add_page('sectionpanel')
+		self.panelmng.add_page('studentpanel', self.studentpanel)
+		self.panelmng.add_page('teacherpanel', self.teacherpanel)
+		self.panelmng.add_page('sectionpanel', self.sectionpanel)
 
 		self.dynresize = dynresize
 
+		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
 		pass
 
-class StudentPanel(Page):
+class PersonPanel(Page):
 	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
 		super().__init__(master)
 
+		#	Name
+		self.name_frm = tk.Frame(master=self)
+		self.name_lbl = tk.Label(master=self.name_frm, text='Name')
+		self.name_entry = tk.Entry(master=self.name_frm, relief='groove', bd=2)
+
+		self.name_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.name_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.name_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Address
+		self.address_frm = tk.Frame(master=self)
+		self.address_lbl = tk.Label(master=self.address_frm, text='Address')
+		self.address_entry = tk.Entry(master=self.address_frm, relief='groove', bd=2)
+
+		self.address_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.address_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.address_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Gender
+		self.gender_frm = tk.Frame(master=self)
+		self.gender_lbl = tk.Label(master=self.gender_frm, text='Gender')
+		self.gender_cbox = ttk.Combobox(master=self.gender_frm, state='readonly', values=constants.GENDERS)
+
+		self.gender_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.gender_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		
+		self.gender_frm.columnconfigure(1, weight=1)
+
+		self.gender_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Contact Number
+		self.contactno_frm = tk.Frame(master=self)
+		self.contactno_lbl = tk.Label(master=self.contactno_frm, text='Contact Number')
+		self.contactno_entry = tk.Entry(master=self.contactno_frm, relief='groove', bd=2)
+
+		self.contactno_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.contactno_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.contactno_frm.pack(fill='x', padx=10, pady=2)
+
+		#	E-mail
+		self.email_frm = tk.Frame(master=self)
+		self.email_lbl = tk.Label(master=self.email_frm, text='E-mail Address')
+		self.email_entry = tk.Entry(master=self.email_frm, relief='groove', bd=2)
+
+		self.email_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.email_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.email_frm.pack(fill='x', padx=10, pady=2)
+
+		self.dynresize = dynresize
+
 	def reload_page(self, event=None) -> None:
 		pass
 
-class TeacherPanel(Page):
+class StudentPanel(PersonPanel):
 	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
-		super().__init__(master)
+		super().__init__(master, dynresize)
+
+		#	Learners Reference Number
+		self.lrn_frm = tk.Frame(master=self)
+		self.lrn_lbl = tk.Label(master=self.lrn_frm, text='LRN')
+		self.lrn_entry = tk.Entry(master=self.lrn_frm, relief='groove', bd=2)
+
+		self.lrn_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.lrn_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.lrn_frm.pack(fill='x', padx=10, pady=2)
+
+		#	School Year
+		self.sy_frm = tk.Frame(master=self)
+		self.sy1_lbl = tk.Label(master=self.sy_frm, text='School Year (From)')
+		self.sy_from_entry = tk.Entry(master=self.sy_frm, relief='groove', bd=2)
+		self.sy2_lbl = tk.Label(master=self.sy_frm, text='School Year (To)')
+		self.sy_to_entry = tk.Entry(master=self.sy_frm, relief='groove', bd=2)
+
+		self.sy1_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy_from_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy2_lbl.grid(column=3, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sy_to_entry.grid(column=4, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+		
+		self.sy_frm.columnconfigure(1, weight=1)
+		self.sy_frm.columnconfigure(4, weight=1)
+
+		self.sy_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Parents
+		self.parents_frm = tk.Frame(master=self)
+		self.parents_lbl = tk.Label(master=self.parents_frm, text='Parents (Sep. w/ Comma)')
+		self.parents_entry = tk.Entry(master=self.parents_frm, relief='groove', bd=2)
+
+		self.parents_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.parents_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.parents_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Grade Level
+		self.grade_frm = tk.Frame(master=self)
+		self.grade_lbl = tk.Label(master=self.grade_frm, text='Grade Level')
+		self.grade_cbox = ttk.Combobox(master=self.grade_frm, state='readonly', values=constants.GRADE_LVLS)
+
+		self.grade_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.grade_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.grade_frm.columnconfigure(1, weight=1)
+
+		self.grade_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Section
+		self.section_frm = tk.Frame(master=self)
+		self.section_lbl = tk.Label(master=self.section_frm, text='Section')
+		self.section_entry = tk.Entry(master=self.section_frm, relief='groove', bd=2)
+
+		self.section_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.section_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.section_frm.pack(fill='x', padx=10, pady=2)
+
+		self.reload_page()
 
 	def reload_page(self, event=None) -> None:
-		pass
+		
+		super().reload_page(event)
+
+class TeacherPanel(PersonPanel):
+	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
+		super().__init__(master, dynresize)
+
+		#	Advisory Class
+		self.advisorycls_frm = tk.Frame(master=self)
+		self.advisorycls_lbl = tk.Label(master=self.advisorycls_frm, text='Advisory Class')
+		self.advisorycls_entry = tk.Entry(master=self.advisorycls_frm, relief='groove', bd=2)
+
+		self.advisorycls_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.advisorycls_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.advisorycls_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Sections
+		self.sections_frm = tk.Frame(master=self)
+		self.sections_lbl = tk.Label(master=self.sections_frm, text='Handled Sections (Sep. w/ Comma)')
+		self.sections_entry = tk.Entry(master=self.sections_frm, relief='groove', bd=2)
+
+		self.sections_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.sections_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.sections_frm.pack(fill='x', padx=10, pady=2)
+
+		self.reload_page()
+
+	def reload_page(self, event=None) -> None:
+		
+		super().reload_page(event)
 
 class SectionPanel(Page):
 	def __init__(self, master: tk.Widget, dynresize: 'DynamicResize') -> None:
 		super().__init__(master)
 
+		#	Name
+		self.name_frm = tk.Frame(master=self)
+		self.name_lbl = tk.Label(master=self.name_frm, text='Name')
+		self.name_entry = tk.Entry(master=self.name_frm, relief='groove', bd=2)
+
+		self.name_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.name_entry.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.name_frm.pack(fill='x', padx=10, pady=2)
+
+		#	Grade Level
+		self.grade_frm = tk.Frame(master=self)
+		self.grade_lbl = tk.Label(master=self.grade_frm, text='Grade Level')
+		self.grade_cbox = ttk.Combobox(master=self.grade_frm, state='readonly', values=constants.GRADE_LVLS)
+
+		self.grade_lbl.grid(column=0, row=0, columnspan=1, rowspan=1, sticky='nsew', padx=6, pady=2)
+		self.grade_cbox.grid(column=1, row=0, columnspan=2, rowspan=1, sticky='nsew', padx=6, pady=2)
+
+		self.grade_frm.columnconfigure(1, weight=1)
+
+		self.grade_frm.pack(fill='x', padx=10, pady=2)
+
+		self.dynresize = dynresize
+
+		self.reload_page()
+
 	def reload_page(self, event=None) -> None:
 		pass
-
 
 class PageManager:
 	def __init__(self) -> None:
